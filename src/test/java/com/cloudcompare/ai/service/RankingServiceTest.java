@@ -195,4 +195,31 @@ class RankingServiceTest {
         assertEquals(5, response.getServices().size());
         assertTrue(response.getServices().stream().anyMatch(s -> "OCI".equals(s.getPlatform())));
     }
+
+    @Test
+    void testParsingExceptionsAndNaN() {
+        List<Map<String, Object>> data = new ArrayList<>();
+        Map<String, Object> svc = new HashMap<>();
+        svc.put("provider", "AWS");
+        svc.put("cpu", "abc"); // triggers NumberFormatException
+        svc.put("price_per_hour", "invalid"); // triggers NumberFormatException
+        svc.put("performance_score", Double.NaN); // triggers NaN in round()
+        data.add(svc);
+
+        CompareResponse response = rankingService.buildResponse(data, "compute", "all", 730, "all", 0, "balanced");
+        ServiceResult aws = response.getServices().stream().filter(s -> "AWS".equals(s.getPlatform())).findFirst().orElse(null);
+        assertNotNull(aws);
+        assertEquals(0, aws.getCpu());
+        assertEquals(0.0, aws.getPricePerHour());
+        assertTrue(Double.isNaN(aws.getPerformanceScore()));
+    }
+
+    @Test
+    void testRecommendationReasonsFull() {
+        String[] categories = {"database", "ai", "unknown"};
+        for (String cat : categories) {
+            CompareResponse response = rankingService.buildResponse(new ArrayList<>(), cat, "all", 730, "all", 0, "balanced");
+            assertNotNull(response.getRecommendation().getReason());
+        }
+    }
 }

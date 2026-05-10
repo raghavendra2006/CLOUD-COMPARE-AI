@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -46,5 +47,35 @@ class GrokClientServiceTest {
         java.util.List<com.cloudcompare.ai.dto.AiToolResult> result = grokClientService.fetchAiToolsComparisonFromGrok("coding");
         assertNotNull(result);
         org.junit.jupiter.api.Assertions.assertFalse(result.isEmpty());
+    }
+
+    @Test
+    void testExtractJson() throws Exception {
+        java.lang.reflect.Method method = GrokClientService.class.getDeclaredMethod("extractJson", String.class);
+        method.setAccessible(true);
+        
+        // Test null/empty
+        assertEquals("[]", method.invoke(grokClientService, (String) null));
+        assertEquals("[]", method.invoke(grokClientService, ""));
+        
+        // Test no brackets
+        assertEquals("raw data", method.invoke(grokClientService, "raw data"));
+        
+        // Test with brackets
+        assertEquals("[{}]", method.invoke(grokClientService, "some text [{}] more text"));
+        assertEquals("{}", method.invoke(grokClientService, "text {}"));
+        
+        // Test edge cases
+        assertEquals("invalid [ text", method.invoke(grokClientService, "invalid [ text"));
+    }
+
+    @Test
+    void testGetApiKeys() throws Exception {
+        java.lang.reflect.Method method = GrokClientService.class.getDeclaredMethod("getApiKeys");
+        method.setAccessible(true);
+        
+        @SuppressWarnings("unchecked")
+        java.util.List<String> keys = (java.util.List<String>) method.invoke(grokClientService);
+        assertNotNull(keys);
     }
 }
