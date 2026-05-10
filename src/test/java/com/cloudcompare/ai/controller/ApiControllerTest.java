@@ -1,8 +1,10 @@
 package com.cloudcompare.ai.controller;
 
 import com.cloudcompare.ai.dto.CompareRequest;
-import com.cloudcompare.ai.service.*;
-import com.cloudcompare.ai.repository.CloudServiceRepository;
+import com.cloudcompare.ai.service.CacheService;
+import com.cloudcompare.ai.service.GrokClientService;
+import com.cloudcompare.ai.service.MetaDataService;
+import com.cloudcompare.ai.service.RankingService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,9 +47,6 @@ class ApiControllerTest {
     @MockBean
     private RankingService rankingService;
 
-    @MockBean
-    private CloudServiceRepository cloudServiceRepository;
-
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -64,7 +63,7 @@ class ApiControllerTest {
         when(grokClientService.fetchComparisonFromGrok(anyString(), anyString()))
                 .thenReturn(Collections.emptyList());
         
-        when(rankingService.buildResponse(any(), anyString(), anyString(), anyInt(), anyString(), anyInt(), anyInt(), anyInt(), anyString()))
+        when(rankingService.buildResponse(any(), anyString(), anyString(), anyInt(), anyString(), anyInt(), anyString()))
                 .thenReturn(new com.cloudcompare.ai.dto.CompareResponse());
 
         mockMvc.perform(post("/api/compare")

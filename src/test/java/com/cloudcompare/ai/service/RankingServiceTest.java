@@ -31,7 +31,7 @@ class RankingServiceTest {
         data.add(svc1);
 
         CompareResponse response = rankingService.buildResponse(
-                data, "compute", "all", 730, "all", 0, 0, 0, "balanced"
+                data, "compute", "all", 730, "all", 0, "balanced"
         );
 
         assertNotNull(response);
@@ -58,7 +58,7 @@ class RankingServiceTest {
         data.add(svc2);
 
         CompareResponse response = rankingService.buildResponse(
-                data, "compute", "all", 730, "all", 0, 0, 0, "cost"
+                data, "compute", "all", 730, "all", 0, "cost"
         );
 
         assertEquals("GCP", response.getServices().get(0).getPlatform());
@@ -80,7 +80,7 @@ class RankingServiceTest {
         data.add(svc2);
 
         CompareResponse response = rankingService.buildResponse(
-                data, "compute", "all", 730, "all", 0, 0, 0, "performance"
+                data, "compute", "all", 730, "all", 0, "performance"
         );
 
         assertEquals("AWS", response.getServices().get(0).getPlatform());
@@ -95,7 +95,7 @@ class RankingServiceTest {
         data.add(svc1);
 
         CompareResponse response = rankingService.buildResponse(
-                data, "storage", "all", 730, "all", 0, 0, 100, "balanced"
+                data, "storage", "all", 730, "all", 100, "balanced"
         );
 
         assertNotNull(response);
@@ -111,7 +111,7 @@ class RankingServiceTest {
         List<Map<String, Object>> data = new ArrayList<>();
         // Empty data
         CompareResponse response = rankingService.buildResponse(
-                data, "compute", "all", 730, "all", 0, 0, 0, "balanced"
+                data, "compute", "all", 730, "all", 0, "balanced"
         );
 
         assertEquals(5, response.getServices().size());

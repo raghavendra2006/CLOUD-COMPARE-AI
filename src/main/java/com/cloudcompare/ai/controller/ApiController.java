@@ -1,8 +1,6 @@
 package com.cloudcompare.ai.controller;
 
 import com.cloudcompare.ai.dto.*;
-import com.cloudcompare.ai.entity.CloudServiceEntity;
-import com.cloudcompare.ai.repository.CloudServiceRepository;
 import com.cloudcompare.ai.service.CacheService;
 import com.cloudcompare.ai.service.GrokClientService;
 import com.cloudcompare.ai.service.MetaDataService;
@@ -30,18 +28,15 @@ public class ApiController {
     private final MetaDataService metaDataService;
     private final CacheService cacheService;
     private final RankingService rankingService;
-    private final CloudServiceRepository cloudServiceRepository;
 
     public ApiController(GrokClientService grokClientService,
                          MetaDataService metaDataService,
                          CacheService cacheService,
-                         RankingService rankingService,
-                         CloudServiceRepository cloudServiceRepository) {
+                         RankingService rankingService) {
         this.grokClientService = grokClientService;
         this.metaDataService = metaDataService;
         this.cacheService = cacheService;
         this.rankingService = rankingService;
-        this.cloudServiceRepository = cloudServiceRepository;
     }
 
     @GetMapping("/test")
@@ -76,13 +71,12 @@ public class ApiController {
             CompareResponse response = rankingService.buildResponse(
                     grokResults, category, svcType,
                     req.getHours(), req.getRegion(),
-                    req.getCpu(), req.getRam(), req.getStorage(),
-                    req.getPriority()
+                    req.getStorage(), req.getPriority()
             );
 
             return ResponseEntity.ok(ApiResponse.success(response));
 
-        } catch (Exception err) {
+        } catch (RuntimeException | java.io.IOException | InterruptedException err) {
             log.error("Comparison failed: {}", err.getMessage());
             String errorMsg = err.getMessage();
             if (errorMsg != null && errorMsg.contains("YOUR_GROQ_API_KEYS_HERE")) {
@@ -127,7 +121,7 @@ public class ApiController {
                 "tools", grokResults
             )));
 
-        } catch (Exception err) {
+        } catch (RuntimeException | java.io.IOException | InterruptedException err) {
             log.error("AI Tool Analysis failed: {}", err.getMessage());
             return ResponseEntity.status(502).body(ApiResponse.error("AI Analysis failed: " + err.getMessage()));
         }

@@ -1,13 +1,19 @@
 package com.cloudcompare.ai.service;
 
-import com.cloudcompare.ai.dto.*;
+import com.cloudcompare.ai.dto.CompareResponse;
+import com.cloudcompare.ai.dto.ProviderStat;
+import com.cloudcompare.ai.dto.ServiceResult;
 import com.cloudcompare.ai.entity.CloudServiceEntity;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -49,7 +55,7 @@ public class RankingService {
     public CompareResponse buildResponse(
             List<Map<String, Object>> grokResults,
             String category, String serviceType,
-            int hours, String region, int cpu, int ram, int storage, String priority) {
+            int hours, String region, int storage, String priority) {
 
         // Normalise Groq output into the UI schema
         Map<String, ServiceResult> merged = new LinkedHashMap<>();
@@ -77,7 +83,7 @@ public class RankingService {
         fillMissingProviders(merged, category, serviceType);
 
         List<ServiceResult> results = new ArrayList<>(merged.values());
-        return rankAndRespond(results, category, hours, region, cpu, ram, storage, priority);
+        return rankAndRespond(results, category, hours, region, storage, priority);
     }
 
     /**
@@ -86,7 +92,7 @@ public class RankingService {
     public CompareResponse buildResponseFromDb(
             List<CloudServiceEntity> dbResults,
             String category, String serviceType,
-            int hours, String region, int cpu, int ram, int storage, String priority) {
+            int hours, String region, int storage, String priority) {
 
         Map<String, ServiceResult> merged = new LinkedHashMap<>();
 
@@ -112,7 +118,7 @@ public class RankingService {
         fillMissingProviders(merged, category, serviceType);
 
         List<ServiceResult> results = new ArrayList<>(merged.values());
-        return rankAndRespond(results, category, hours, region, cpu, ram, storage, priority);
+        return rankAndRespond(results, category, hours, region, storage, priority);
     }
 
     private void fillMissingProviders(Map<String, ServiceResult> merged, String category, String serviceType) {
@@ -139,7 +145,7 @@ public class RankingService {
 
     private CompareResponse rankAndRespond(
             List<ServiceResult> results, String category,
-            int hours, String region, int cpu, int ram, int storage, String priority) {
+            int hours, String region, int storage, String priority) {
 
         Weights w = determineWeights(priority);
         double performanceWeight = w.performance;
