@@ -50,7 +50,7 @@ docker-compose up -d --build
 
 # 🏗️ System Architecture
 
-![CloudCompare AI Architecture](cloud_compare_ai_architecture_1778263045760.png)
+![CloudCompare AI Architecture](cloud_compare_ai_architecture_1778263045760.jpg)
 
 ```mermaid
 graph TD
