@@ -15,10 +15,50 @@
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         @keyframes slideIn { from { opacity: 0; transform: translateZ(30px) translateY(20px); } to { opacity: 1; transform: translateZ(30px) translateY(0); } }
 
-        body { margin: 0; background: #060b1e; color: white; font-family: 'Inter', sans-serif; min-height: 100vh; }
+        body {
+            margin: 0;
+            background: #060b1e;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+
+        /* Auth nav */
+        .auth-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 2.5rem;
+            position: relative;
+            z-index: 20;
+        }
+        .auth-nav-logo {
+            display: flex; align-items: center; gap: 10px;
+            font-weight: 700; font-size: 1.2rem; color: #fff;
+            text-decoration: none; transition: color 0.3s;
+        }
+        .auth-nav-logo i {
+            font-size: 1.3rem;
+            background: linear-gradient(135deg, #00d4aa, #7c3aed);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .auth-nav-actions { display: flex; gap: 0.5rem; align-items: center; }
+        .theme-toggle-auth {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
+            color: #fbbf24; font-size: 1rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+        }
+        .theme-toggle-auth:hover { background: rgba(0,212,170,0.12); border-color: #00d4aa; transform: translateY(-2px) rotate(15deg); }
+        .theme-toggle-auth:active i { transform: rotate(180deg); }
+        .theme-toggle-auth i { transition: transform 0.4s ease; }
         
         .auth-container {
-            min-height: 100vh;
+            min-height: calc(100vh - 70px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -41,6 +81,7 @@
             position: relative;
             overflow: hidden;
             transform-style: preserve-3d;
+            transition: background 0.5s, border-color 0.5s, box-shadow 0.5s;
         }
 
         .auth-card::before {
@@ -64,11 +105,11 @@
             filter: drop-shadow(0 0 15px rgba(0, 212, 170, 0.4));
             animation: float 4s ease-in-out infinite;
         }
-        .auth-header h2 { font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 0.5rem; }
-        .auth-header p { color: #94a3b8; font-size: 1rem; }
+        .auth-header h2 { font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 0.5rem; transition: color 0.3s; }
+        .auth-header p { color: #94a3b8; font-size: 1rem; transition: color 0.3s; }
 
         .form-group { margin-bottom: 1.5rem; transform: translateZ(30px); opacity: 0; animation: slideIn 0.8s forwards; }
-        .form-group label { display: block; margin-bottom: 0.6rem; color: #94a3b8; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .form-group label { display: block; margin-bottom: 0.6rem; color: #94a3b8; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; transition: color 0.3s; }
 
         .form-control {
             width: 100%;
@@ -111,7 +152,7 @@
         .btn-auth::after { content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); transition: 0.6s; }
         .btn-auth:hover::after { left: 100%; }
 
-        .auth-footer { margin-top: 2.5rem; text-align: center; color: #64748b; transform: translateZ(20px); }
+        .auth-footer { margin-top: 2.5rem; text-align: center; color: #64748b; transform: translateZ(20px); transition: color 0.3s; }
         .auth-footer a { color: #00d4aa; text-decoration: none; font-weight: 800; transition: 0.3s; }
         .auth-footer a:hover { color: white; text-shadow: 0 0 10px #00d4aa; }
 
@@ -123,26 +164,20 @@
         .alert-error { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; }
         .alert-success { background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.3); color: #86efac; }
 
-        /* Dynamic Particle System */
         .particle-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
         .particle { position: absolute; background: #7c3aed; border-radius: 50%; opacity: 0.4; animation: drift linear infinite; }
         
         .light-follow {
-            position: fixed;
-            width: 600px;
-            height: 600px;
+            position: fixed; width: 600px; height: 600px;
             background: radial-gradient(circle, rgba(0, 212, 170, 0.06), transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 1;
+            border-radius: 50%; pointer-events: none; z-index: 1;
             transform: translate(-50%, -50%);
-            transition: left 0.15s ease-out, top 0.15s ease-out;
+            transition: left 0.15s ease-out, top 0.15s ease-out, opacity 0.5s;
         }
 
-        /* Modal Styles */
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s; }
         .modal.active { opacity: 1; visibility: visible; }
-        .modal .modal-content { background: rgba(15,23,42,0.95); border: 1px solid rgba(0,212,170,0.15); border-radius: 20px; padding: 2rem; width: 90%; max-width: 420px; backdrop-filter: blur(20px); }
+        .modal .modal-content { background: rgba(15,23,42,0.95); border: 1px solid rgba(0,212,170,0.15); border-radius: 20px; padding: 2rem; width: 90%; max-width: 420px; backdrop-filter: blur(20px); transition: background 0.5s, border-color 0.5s; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
         .modal-header h3 { font-size: 1.3rem; }
         .modal-close { background: none; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer; }
@@ -150,10 +185,52 @@
         .form-validation { font-size: 0.75rem; margin-top: 0.4rem; display: none; align-items: center; gap: 0.3rem; }
         .form-validation.error { color: #fca5a5; display: flex; }
         .form-validation.success { color: #86efac; display: flex; }
+
+        /* ══ LIGHT THEME ══ */
+        body.light-theme { background: linear-gradient(180deg, #f0f4f8 0%, #e8ecf2 100%); color: #1e293b; }
+        body.light-theme .auth-nav-logo { color: #1e293b; }
+        body.light-theme .theme-toggle-auth { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.1); color: #7c3aed; }
+        body.light-theme .theme-toggle-auth:hover { background: rgba(124,58,237,0.08); border-color: #7c3aed; }
+        body.light-theme .auth-card {
+            background: rgba(255,255,255,0.85);
+            border-color: rgba(0,0,0,0.08);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.08);
+            animation: unfold 1.2s cubic-bezier(0.23, 1, 0.32, 1) both;
+        }
+        body.light-theme .auth-card::before { opacity: 0; }
+        body.light-theme .auth-header h2 { color: #0f172a; }
+        body.light-theme .auth-header p { color: #64748b; }
+        body.light-theme .form-group label { color: #64748b; }
+        body.light-theme .form-control { background: rgba(241,245,249,0.9); border-color: rgba(0,0,0,0.08); color: #1e293b; }
+        body.light-theme .form-control:focus { border-color: #00d4aa; background: #fff; box-shadow: 0 0 20px rgba(0,212,170,0.1); }
+        body.light-theme .form-control::placeholder { color: #94a3b8; }
+        body.light-theme .auth-footer { color: #94a3b8; }
+        body.light-theme .auth-footer a { color: #059669; }
+        body.light-theme .auth-footer a:hover { color: #0f172a; text-shadow: none; }
+        body.light-theme .forgot-password-link a { color: #94a3b8; }
+        body.light-theme .forgot-password-link a:hover { color: #059669; }
+        body.light-theme .light-follow { opacity: 0; }
+        body.light-theme .particle { opacity: 0.08; background: #7c3aed; }
+        body.light-theme .modal .modal-content { background: rgba(255,255,255,0.95); border-color: rgba(0,0,0,0.08); }
+        body.light-theme .modal-header h3 { color: #0f172a; }
+        body.light-theme .modal-description { color: #64748b; }
+        body.light-theme .btn-auth { color: #fff; }
     </style>
 </head>
 <body>
     <div class="light-follow" id="lightFollow"></div>
+
+    <nav class="auth-nav">
+        <a href="index.html" class="auth-nav-logo">
+            <i class="fas fa-cloud"></i> CloudCompare AI
+        </a>
+        <div class="auth-nav-actions">
+            <button class="theme-toggle-auth" id="themeToggle" title="Toggle light/dark mode">
+                <i class="fas fa-sun" id="themeIcon"></i>
+            </button>
+        </div>
+    </nav>
+
     <div class="app-container">
         <div class="auth-container">
             <div class="auth-card">
@@ -217,38 +294,42 @@
     </div>
 
     <script>
-        // Email validation regex - requires proper format with 2+ character domain extension
+        // ═══ Theme Toggle ═══
+        (function() {
+            const toggle = document.getElementById('themeToggle');
+            const icon = document.getElementById('themeIcon');
+            const saved = localStorage.getItem('cc-theme');
+            if (saved === 'light') {
+                document.body.classList.add('light-theme');
+                icon.classList.replace('fa-sun', 'fa-moon');
+            }
+            toggle.addEventListener('click', () => {
+                const isLight = document.body.classList.toggle('light-theme');
+                icon.classList.replace(isLight ? 'fa-sun' : 'fa-moon', isLight ? 'fa-moon' : 'fa-sun');
+                localStorage.setItem('cc-theme', isLight ? 'light' : 'dark');
+            });
+        })();
+
+        // ═══ EMAIL VALIDATION ═══
         const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
 
-        // Email field validation
-        document.getElementById('email').addEventListener('blur', () => {
-            validateLoginEmail();
-        });
+        document.getElementById('email').addEventListener('blur', () => { validateLoginEmail(); });
 
         function validateLoginEmail() {
             const emailInput = document.getElementById('email');
             const emailValidation = document.getElementById('emailValidation');
             const email = emailInput.value.trim();
-
-            if (!email) {
-                emailValidation.style.display = 'none';
-                return true;
-            }
-
+            if (!email) { emailValidation.style.display = 'none'; return true; }
             if (!emailRegex.test(email)) {
                 emailValidation.innerHTML = '<i class="fas fa-exclamation-circle"></i> Invalid email format';
-                emailValidation.classList.remove('success');
-                emailValidation.classList.add('error');
-                return false;
+                emailValidation.classList.remove('success'); emailValidation.classList.add('error'); return false;
             } else {
                 emailValidation.innerHTML = '<i class="fas fa-check-circle"></i> Valid email';
-                emailValidation.classList.remove('error');
-                emailValidation.classList.add('success');
-                return true;
+                emailValidation.classList.remove('error'); emailValidation.classList.add('success'); return true;
             }
         }
 
-        // Forgot Password Modal Functions
+        // ═══ FORGOT PASSWORD MODAL ═══
         function openForgotPasswordModal() {
             document.getElementById('forgotPasswordModal').classList.add('active');
             document.getElementById('resetStatusMsg').style.display = 'none';
@@ -256,198 +337,107 @@
             document.getElementById('resetEmail').value = '';
             document.getElementById('resetEmailValidation').style.display = 'none';
         }
+        function closeForgotPasswordModal() { document.getElementById('forgotPasswordModal').classList.remove('active'); }
 
-        function closeForgotPasswordModal() {
-            document.getElementById('forgotPasswordModal').classList.remove('active');
-        }
-
-        // Reset email validation
-        document.getElementById('resetEmail').addEventListener('blur', () => {
-            validateResetEmail();
-        });
-
+        document.getElementById('resetEmail').addEventListener('blur', () => { validateResetEmail(); });
         function validateResetEmail() {
             const emailInput = document.getElementById('resetEmail');
             const emailValidation = document.getElementById('resetEmailValidation');
             const email = emailInput.value.trim();
-
-            if (!email) {
-                emailValidation.style.display = 'none';
-                return true;
-            }
-
+            if (!email) { emailValidation.style.display = 'none'; return true; }
             if (!emailRegex.test(email)) {
                 emailValidation.innerHTML = '<i class="fas fa-exclamation-circle"></i> Invalid email format';
-                emailValidation.classList.remove('success');
-                emailValidation.classList.add('error');
-                return false;
+                emailValidation.classList.remove('success'); emailValidation.classList.add('error'); return false;
             } else {
                 emailValidation.innerHTML = '<i class="fas fa-check-circle"></i> Valid email';
-                emailValidation.classList.remove('error');
-                emailValidation.classList.add('success');
-                return true;
+                emailValidation.classList.remove('error'); emailValidation.classList.add('success'); return true;
             }
         }
 
-        // Forgot Password Form Submission
         document.getElementById('forgotPasswordForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            if (!validateResetEmail()) {
-                return;
-            }
-
+            if (!validateResetEmail()) return;
             const btn = document.getElementById('resetBtn');
             const statusMsg = document.getElementById('resetStatusMsg');
             const email = document.getElementById('resetEmail').value.trim();
-
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-            btn.disabled = true;
-            statusMsg.style.display = 'none';
-
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...'; btn.disabled = true; statusMsg.style.display = 'none';
             try {
-                const response = await fetch('/api/auth/forgot-password', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email })
-                });
-
-                if (response.status === 404) {
+                const response = await fetch('/api/auth/forgot-password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
+                if (response.status === 404 || response.ok) {
                     statusMsg.textContent = 'If an account exists with this email, you will receive a password reset link.';
-                    statusMsg.classList.add('alert-success');
-                    statusMsg.style.display = 'block';
-                    setTimeout(() => closeForgotPasswordModal(), 3000);
-                } else if (response.ok) {
-                    statusMsg.textContent = 'Password reset link sent to your email!';
-                    statusMsg.classList.add('alert-success');
-                    statusMsg.style.display = 'block';
+                    statusMsg.classList.add('alert-success'); statusMsg.style.display = 'block';
                     setTimeout(() => closeForgotPasswordModal(), 3000);
                 } else {
                     statusMsg.textContent = 'Failed to process request. Please try again.';
-                    statusMsg.classList.add('alert-error');
-                    statusMsg.style.display = 'block';
+                    statusMsg.classList.add('alert-error'); statusMsg.style.display = 'block';
                 }
             } catch (err) {
                 statusMsg.textContent = 'Network error. Please try again later.';
-                statusMsg.classList.add('alert-error');
-                statusMsg.style.display = 'block';
-            } finally {
-                btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Reset Link';
-                btn.disabled = false;
-            }
+                statusMsg.classList.add('alert-error'); statusMsg.style.display = 'block';
+            } finally { btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Reset Link'; btn.disabled = false; }
         });
 
-        // Login Form Submission
+        // ═══ LOGIN FORM ═══
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            if (!validateLoginEmail()) {
-                return;
-            }
-
+            if (!validateLoginEmail()) return;
             const btn = document.getElementById('loginBtn');
             const errorMsg = document.getElementById('errorMsg');
-            
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
-            btn.disabled = true;
-            errorMsg.style.display = 'none';
-
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...'; btn.disabled = true; errorMsg.style.display = 'none';
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
-
             try {
-                const response = await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
-
+                const response = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
                 const text = await response.text();
-                let data;
-                try { data = JSON.parse(text); } catch(e) { data = {}; }
-
+                let data; try { data = JSON.parse(text); } catch(e) { data = {}; }
                 if (response.ok) {
-                    createSuccessBurst();
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('userName', data.name);
-                    setTimeout(() => {
-                        window.location.href = 'dashboard.html?login=success';
-                    }, 1200);
+                    createSuccessBurst(); localStorage.setItem('token', data.token); localStorage.setItem('userName', data.name);
+                    setTimeout(() => { window.location.href = 'dashboard.html?login=success'; }, 1200);
                 } else {
                     triggerErrorShake();
-                    errorMsg.textContent = data.error || data.message || 'Invalid email or password';
-                    errorMsg.style.display = 'block';
+                    errorMsg.textContent = data.error || data.message || 'Invalid email or password'; errorMsg.style.display = 'block';
                 }
             } catch (err) {
-                errorMsg.textContent = 'Unable to connect to the server. Please make sure the backend is running.';
-                errorMsg.style.display = 'block';
-            } finally {
-                btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
-                btn.disabled = false;
-            }
+                errorMsg.textContent = 'Unable to connect to the server. Please make sure the backend is running.'; errorMsg.style.display = 'block';
+            } finally { btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In'; btn.disabled = false; }
         });
 
-        // Close modal on background click
-        document.getElementById('forgotPasswordModal').addEventListener('click', function(event) {
-            if (event.target === this) {
-                closeForgotPasswordModal();
-            }
-        });
+        document.getElementById('forgotPasswordModal').addEventListener('click', function(event) { if (event.target === this) closeForgotPasswordModal(); });
 
-        // UI EXCELLENCE: Particle Background
+        // ═══ PARTICLES ═══
         function initParticleSystem() {
-            const bg = document.createElement('div');
-            bg.className = 'particle-bg';
-            document.body.appendChild(bg);
-            
+            const bg = document.createElement('div'); bg.className = 'particle-bg'; document.body.appendChild(bg);
             for (let i = 0; i < 20; i++) {
-                const p = document.createElement('div');
-                p.className = 'particle';
+                const p = document.createElement('div'); p.className = 'particle';
                 const size = Math.random() * 4 + 2;
-                p.style.width = `${size}px`;
-                p.style.height = `${size}px`;
-                p.style.left = `${Math.random() * 100}%`;
-                p.style.animationDuration = `${Math.random() * 10 + 10}s`;
-                p.style.animationDelay = `${Math.random() * 10}s`;
-                p.style.opacity = Math.random() * 0.5;
-                bg.appendChild(p);
+                p.style.width = `${size}px`; p.style.height = `${size}px`; p.style.left = `${Math.random() * 100}%`;
+                p.style.animationDuration = `${Math.random() * 10 + 10}s`; p.style.animationDelay = `${Math.random() * 10}s`;
+                p.style.opacity = Math.random() * 0.5; bg.appendChild(p);
             }
         }
         initParticleSystem();
 
-        // UI EXCELLENCE: Dynamic Light Follow
+        // ═══ LIGHT FOLLOW + TILT ═══
         const light = document.getElementById('lightFollow');
         const card = document.querySelector('.auth-card');
         document.addEventListener('mousemove', (e) => {
-            light.style.left = `${e.clientX}px`;
-            light.style.top = `${e.clientY}px`;
-            
-            // Perspective Tilt logic
+            light.style.left = `${e.clientX}px`; light.style.top = `${e.clientY}px`;
             const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
             const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
             card.style.transform = `perspective(1200px) rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
         });
 
-        // UI EXCELLENCE: Success Particle Burst
         function createSuccessBurst() {
             for (let i = 0; i < 80; i++) {
-                const p = document.createElement('div');
-                p.className = 'success-particle';
+                const p = document.createElement('div'); p.className = 'success-particle';
                 p.style.setProperty('--tx', `${(Math.random() - 0.5) * 600}px`);
                 p.style.setProperty('--ty', `${(Math.random() - 0.5) * 600}px`);
-                p.style.left = '50%';
-                p.style.top = '50%';
+                p.style.left = '50%'; p.style.top = '50%';
                 p.style.background = Math.random() > 0.5 ? '#00d4aa' : '#7c3aed';
-                document.body.appendChild(p);
-                setTimeout(() => p.remove(), 1000);
+                document.body.appendChild(p); setTimeout(() => p.remove(), 1000);
             }
         }
-
-        // Trigger shake on error
-        function triggerErrorShake() {
-            card.classList.add('shake');
-            setTimeout(() => card.classList.remove('shake'), 500);
-        }
+        function triggerErrorShake() { card.classList.add('shake'); setTimeout(() => card.classList.remove('shake'), 500); }
     </script>
 </body>
 </html>

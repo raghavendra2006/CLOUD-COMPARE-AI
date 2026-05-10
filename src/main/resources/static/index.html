@@ -16,6 +16,7 @@
             color: #e2e8f0;
             min-height: 100vh;
             overflow-x: hidden;
+            transition: background 0.5s ease, color 0.5s ease;
         }
 
         /* ── NAV ── */
@@ -35,6 +36,7 @@
             font-size: 1.3rem;
             color: #fff;
             text-decoration: none;
+            transition: color 0.3s;
         }
         .nav-logo i {
             font-size: 1.5rem;
@@ -65,6 +67,27 @@
         }
         .btn-signup-nav:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,212,170,0.3); }
 
+        /* Theme Toggle */
+        .theme-toggle-landing {
+            width: 42px; height: 42px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.06);
+            color: #fbbf24;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .theme-toggle-landing:hover {
+            background: rgba(0,212,170,0.12);
+            border-color: #00d4aa;
+            transform: translateY(-2px) rotate(15deg);
+            box-shadow: 0 4px 20px rgba(0,212,170,0.2);
+        }
+        .theme-toggle-landing i { transition: transform 0.4s ease; }
+        .theme-toggle-landing:active i { transform: rotate(180deg); }
+
         /* ── HERO ── */
         .hero {
             display: grid;
@@ -89,6 +112,7 @@
             font-weight: 900;
             line-height: 1.1;
             margin-bottom: 1.5rem;
+            transition: color 0.3s;
         }
         .hero-title .gradient-text {
             background: linear-gradient(135deg, #7c3aed, #00d4aa);
@@ -101,8 +125,9 @@
             max-width: 480px;
             line-height: 1.7;
             margin-bottom: 2rem;
+            transition: color 0.3s;
         }
-        .hero-btns { display: flex; gap: 1rem; align-items: center; }
+        .hero-btns { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
         .btn-primary {
             padding: 0.9rem 2rem;
             background: linear-gradient(135deg, #00d4aa, #00b894);
@@ -143,12 +168,12 @@
         }
         .orb {
             position: absolute;
-            width: 420px;
-            height: 420px;
+            width: 420px; height: 420px;
             border-radius: 50%;
             background: radial-gradient(circle, rgba(124,58,237,0.25) 0%, rgba(124,58,237,0.05) 50%, transparent 70%);
             border: 1px solid rgba(124,58,237,0.15);
             animation: orbPulse 6s ease-in-out infinite;
+            transition: opacity 0.5s;
         }
         @keyframes orbPulse {
             0%, 100% { transform: scale(1); opacity: 0.8; }
@@ -156,20 +181,18 @@
         }
         .badge-text {
             position: absolute;
-            top: -20px;
-            right: -10px;
+            top: -20px; right: -10px;
             background: rgba(15,23,42,0.8);
             border: 1px solid rgba(255,255,255,0.1);
             padding: 6px 14px;
             border-radius: 20px;
             font-size: 0.75rem;
             color: #fbbf24;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            display: flex; align-items: center; gap: 6px;
             backdrop-filter: blur(10px);
             white-space: nowrap;
             z-index: 15;
+            transition: background 0.3s, border-color 0.3s, color 0.3s;
         }
         .cloud-card {
             position: absolute;
@@ -177,12 +200,8 @@
             border: 1px solid rgba(255,255,255,0.08);
             border-radius: 14px;
             padding: 12px 18px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: #e2e8f0;
+            display: flex; align-items: center; gap: 10px;
+            font-weight: 600; font-size: 0.85rem; color: #e2e8f0;
             backdrop-filter: blur(15px);
             transition: all 0.4s;
             cursor: default;
@@ -190,20 +209,16 @@
             animation: cardFloat 5s ease-in-out infinite;
         }
         .cloud-card:hover { transform: translateY(-5px) scale(1.05); border-color: rgba(0,212,170,0.3); }
-        .cloud-card img, .cloud-card .card-icon {
-            width: 28px;
-            height: 28px;
+        .cloud-card .card-icon {
+            width: 28px; height: 28px;
             border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             font-size: 1.1rem;
         }
         @keyframes cardFloat {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-8px); }
         }
-        /* Position each card */
         .card-aws      { top: 5%;  left: 30%;  animation-delay: 0s; }
         .card-azure     { top: 12%; right: 5%; animation-delay: -1s; }
         .card-gcloud    { top: 40%; left: 10%; animation-delay: -2s; }
@@ -230,6 +245,7 @@
             background: rgba(10,15,35,0.6);
             backdrop-filter: blur(10px);
             padding: 2rem 3rem;
+            transition: background 0.5s, border-color 0.5s;
         }
         .stat-item {
             display: flex;
@@ -239,20 +255,18 @@
         }
         .stat-item:not(:last-child) { border-right: 1px solid rgba(255,255,255,0.06); }
         .stat-icon {
-            width: 44px;
-            height: 44px;
+            width: 44px; height: 44px;
             border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             font-size: 1.1rem;
+            transition: background 0.3s;
         }
         .stat-icon.cat { background: rgba(99,102,241,0.15); color: #818cf8; }
         .stat-icon.tool { background: rgba(0,212,170,0.12); color: #00d4aa; }
         .stat-icon.cloud { background: rgba(56,189,248,0.12); color: #38bdf8; }
         .stat-icon.live { background: rgba(251,191,36,0.12); color: #fbbf24; }
-        .stat-number { font-size: 1.5rem; font-weight: 800; color: #fff; }
-        .stat-label { font-size: 0.8rem; color: #64748b; }
+        .stat-number { font-size: 1.5rem; font-weight: 800; color: #fff; transition: color 0.3s; }
+        .stat-label { font-size: 0.8rem; color: #64748b; transition: color 0.3s; }
 
         /* ── BG GRADIENTS ── */
         .bg-glow {
@@ -261,10 +275,66 @@
             filter: blur(120px);
             pointer-events: none;
             z-index: 0;
+            transition: opacity 0.5s;
         }
         .glow-1 { width: 600px; height: 600px; top: -10%; left: -5%; background: rgba(124,58,237,0.12); }
         .glow-2 { width: 500px; height: 500px; bottom: 10%; right: -5%; background: rgba(0,212,170,0.08); }
         .glow-3 { width: 400px; height: 400px; top: 40%; left: 40%; background: rgba(99,102,241,0.06); }
+
+        /* ══════════════════════════════════════════
+           LIGHT THEME
+           ══════════════════════════════════════════ */
+        body.light-theme {
+            background: linear-gradient(180deg, #f0f4f8 0%, #e8ecf2 50%, #f0f4f8 100%);
+            color: #1e293b;
+        }
+        body.light-theme .bg-glow { opacity: 0.3; }
+        body.light-theme .nav-logo { color: #1e293b; }
+        body.light-theme .btn-login-nav { color: #475569; border-color: rgba(0,0,0,0.12); }
+        body.light-theme .btn-login-nav:hover { border-color: #00b894; color: #059669; }
+        body.light-theme .btn-signup-nav { color: #fff; }
+        body.light-theme .theme-toggle-landing {
+            background: rgba(0,0,0,0.04);
+            border-color: rgba(0,0,0,0.1);
+            color: #7c3aed;
+        }
+        body.light-theme .theme-toggle-landing:hover {
+            background: rgba(124,58,237,0.08);
+            border-color: #7c3aed;
+        }
+        body.light-theme .hero-title { color: #0f172a; }
+        body.light-theme .hero-description { color: #64748b; }
+        body.light-theme .btn-outline { color: #475569; border-color: rgba(0,0,0,0.15); }
+        body.light-theme .btn-outline:hover { border-color: #7c3aed; color: #7c3aed; }
+        body.light-theme .orb {
+            background: radial-gradient(circle, rgba(124,58,237,0.1) 0%, rgba(124,58,237,0.02) 50%, transparent 70%);
+            border-color: rgba(124,58,237,0.08);
+        }
+        body.light-theme .cloud-card {
+            background: rgba(255,255,255,0.85);
+            border-color: rgba(0,0,0,0.08);
+            color: #1e293b;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+        body.light-theme .cloud-card:hover { border-color: rgba(0,212,170,0.3); box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+        body.light-theme .badge-text {
+            background: rgba(255,255,255,0.9);
+            border-color: rgba(0,0,0,0.08);
+            color: #b45309;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+        body.light-theme .stats-bar {
+            background: rgba(255,255,255,0.7);
+            border-top-color: rgba(0,0,0,0.06);
+            backdrop-filter: blur(10px);
+        }
+        body.light-theme .stat-item:not(:last-child) { border-right-color: rgba(0,0,0,0.06); }
+        body.light-theme .stat-number { color: #0f172a; }
+        body.light-theme .stat-label { color: #64748b; }
+        body.light-theme .stat-icon.cat { background: rgba(99,102,241,0.08); }
+        body.light-theme .stat-icon.tool { background: rgba(0,212,170,0.08); }
+        body.light-theme .stat-icon.cloud { background: rgba(56,189,248,0.08); }
+        body.light-theme .stat-icon.live { background: rgba(251,191,36,0.08); }
 
         /* ── RESPONSIVE ── */
         @media (max-width: 900px) {
@@ -293,6 +363,9 @@
             <span>CloudCompare AI</span>
         </a>
         <div class="nav-actions">
+            <button class="theme-toggle-landing" id="themeToggle" title="Toggle light/dark mode">
+                <i class="fas fa-sun" id="themeIcon"></i>
+            </button>
             <a href="login.html" class="btn-nav btn-login-nav">Login</a>
             <a href="signup.html" class="btn-nav btn-signup-nav">Signup</a>
         </div>
@@ -344,5 +417,26 @@
             <div><div class="stat-number">Real-Time</div><div class="stat-label">Insights</div></div>
         </div>
     </section>
+
+    <script>
+        // Theme toggle — syncs with dashboard via localStorage
+        (function() {
+            const toggle = document.getElementById('themeToggle');
+            const icon = document.getElementById('themeIcon');
+            const saved = localStorage.getItem('cc-theme');
+            if (saved === 'light') {
+                document.body.classList.add('light-theme');
+                icon.classList.replace('fa-sun', 'fa-moon');
+            }
+            toggle.addEventListener('click', () => {
+                const isLight = document.body.classList.toggle('light-theme');
+                icon.classList.replace(
+                    isLight ? 'fa-sun' : 'fa-moon',
+                    isLight ? 'fa-moon' : 'fa-sun'
+                );
+                localStorage.setItem('cc-theme', isLight ? 'light' : 'dark');
+            });
+        })();
+    </script>
 </body>
 </html>
