@@ -63,17 +63,17 @@ public class AuthController {
             UserEntity user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow();
 
             logger.info("Login successful for: {}", loginRequest.getEmail());
-            return ResponseEntity.ok(Map.of(
+            return ResponseEntity.ok(com.cloudcompare.ai.dto.ApiResponse.success(Map.of(
                     "token", jwt,
                     "name", user.getName(),
                     "email", user.getEmail()
-            ));
+            )));
         } catch (org.springframework.security.core.AuthenticationException e) {
             logger.error("Login failed: ", e);
-            return ResponseEntity.status(401).body(Map.of("error", "Invalid email or password"));
+            return ResponseEntity.status(401).body(com.cloudcompare.ai.dto.ApiResponse.error("Invalid email or password"));
         } catch (java.util.NoSuchElementException e) {
             logger.error("Login failed - user not found: ", e);
-            return ResponseEntity.status(401).body(Map.of("error", "Invalid email or password"));
+            return ResponseEntity.status(401).body(com.cloudcompare.ai.dto.ApiResponse.error("Invalid email or password"));
         }
     }
 }

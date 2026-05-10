@@ -49,9 +49,49 @@ class AuthControllerTest {
         request.setEmail("wrong@example.com");
         request.setPassword("wrongpass");
 
+        org.mockito.Mockito.when(authenticationManager.authenticate(org.mockito.ArgumentMatchers.any()))
+                .thenThrow(new org.springframework.security.authentication.BadCredentialsException("Bad credentials"));
+
         mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @MockBean
+    private org.springframework.security.authentication.AuthenticationManager authenticationManager;
+
+    @MockBean
+    private com.cloudcompare.ai.security.JwtUtil jwtUtil;
+
+    @MockBean
+    private com.cloudcompare.ai.repository.UserRepository userRepository;
+
+    @Test
+    void testLoginSuccess() throws Exception {
+        LoginRequest request = new LoginRequest();
+        request.setEmail("test@example.com");
+        request.setPassword("Password123!");
+
+        org.springframework.security.core.Authentication authentication = org.mockito.Mockito.mock(org.springframework.security.core.Authentication.class);
+        org.springframework.security.core.userdetails.UserDetails userDetails = org.mockito.Mockito.mock(org.springframework.security.core.userdetails.UserDetails.class);
+
+        org.mockito.Mockito.when(authenticationManager.authenticate(org.mockito.ArgumentMatchers.any()))
+                .thenReturn(authentication);
+        org.mockito.Mockito.when(authentication.getPrincipal()).thenReturn(userDetails);
+        org.mockito.Mockito.when(jwtUtil.generateToken(userDetails)).thenReturn("dummy-jwt-token");
+
+        com.cloudcompare.ai.entity.UserEntity user = new com.cloudcompare.ai.entity.UserEntity();
+        user.setName("Test Name");
+        user.setEmail("test@example.com");
+        org.mockito.Mockito.when(userRepository.findByEmail(org.mockito.ArgumentMatchers.anyString()))
+                .thenReturn(java.util.Optional.of(user));
+
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath("$.success").value(true))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath("$.data.token").value("dummy-jwt-token"));
     }
 }

@@ -90,4 +90,76 @@ class ApiControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
     }
+
+    @Test
+    @WithMockUser(username = "test@example.com")
+    void testCompareEndpointException() throws Exception {
+        CompareRequest request = new CompareRequest();
+        request.setCategory("compute");
+        request.setServiceType("all");
+
+        when(metaDataService.getDefaultServiceType(anyString())).thenReturn("Virtual Machines");
+        when(cacheService.get(anyString())).thenReturn(null);
+        when(grokClientService.fetchComparisonFromGrok(anyString(), anyString()))
+                .thenThrow(new java.io.IOException("YOUR_GROQ_API_KEYS_HERE Error"));
+
+        mockMvc.perform(post("/api/compare")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadGateway())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.error").value("AI Engine Configuration Missing. Please set the GROK_API_KEYS environment variable to enable live analysis."));
+    }
+
+    @Test
+    void testGetServiceTypes() throws Exception {
+        when(metaDataService.getServiceTypes(anyString())).thenReturn(Collections.emptyList());
+        mockMvc.perform(get("/api/service-types/compute"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
+    }
+
+    @Test
+    void testGetRegions() throws Exception {
+        when(metaDataService.getRegions()).thenReturn(Collections.emptyList());
+        mockMvc.perform(get("/api/regions"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
+    }
+
+    @Test
+    @WithMockUser(username = "test@example.com")
+    void testCompareAiTools() throws Exception {
+        com.cloudcompare.ai.dto.AiCompareRequest req = new com.cloudcompare.ai.dto.AiCompareRequest();
+        req.setPurpose("testing");
+
+        when(cacheService.get(anyString())).thenReturn(null);
+        com.cloudcompare.ai.dto.AiToolResult tool = new com.cloudcompare.ai.dto.AiToolResult();
+        tool.setScore(9.5);
+        when(grokClientService.fetchAiToolsComparisonFromGrok(anyString()))
+                .thenReturn(new java.util.ArrayList<>(java.util.List.of(tool)));
+
+        mockMvc.perform(post("/api/ai-compare")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
+    }
+
+    @Test
+    @WithMockUser(username = "test@example.com")
+    void testCompareAiToolsException() throws Exception {
+        com.cloudcompare.ai.dto.AiCompareRequest req = new com.cloudcompare.ai.dto.AiCompareRequest();
+        req.setPurpose("testing");
+
+        when(cacheService.get(anyString())).thenReturn(null);
+        when(grokClientService.fetchAiToolsComparisonFromGrok(anyString()))
+                .thenThrow(new java.io.IOException("Groq error"));
+
+        mockMvc.perform(post("/api/ai-compare")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isBadGateway())
+                .andExpect(jsonPath("$.success").value(false));
+    }
 }
