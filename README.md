@@ -31,6 +31,8 @@ The platform analyzes cloud resources such as compute, storage, pricing, and reg
 
 # 🏗️ System Architecture
 
+![CloudCompare AI Architecture](cloud_compare_ai_architecture_1778263045760.png)
+
 ```mermaid
 graph TD
     User((User)) --> Frontend[Frontend Dashboard]
