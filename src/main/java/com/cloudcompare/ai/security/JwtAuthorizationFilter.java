@@ -34,7 +34,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             jwt = authHeader.substring(7);
             try {
                 username = jwtUtil.extractUsername(jwt);
-            } catch (Exception e) {
+            } catch (io.jsonwebtoken.JwtException | IllegalArgumentException e) {
                 logger.error("Token extraction failed", e);
             }
         }
@@ -49,7 +49,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
-            } catch (Exception e) {
+            } catch (org.springframework.security.core.userdetails.UsernameNotFoundException | io.jsonwebtoken.JwtException e) {
                 logger.debug("User not found or token invalid: " + e.getMessage());
             }
         }

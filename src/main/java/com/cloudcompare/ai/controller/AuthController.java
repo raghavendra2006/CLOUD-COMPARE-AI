@@ -68,8 +68,11 @@ public class AuthController {
                     "name", user.getName(),
                     "email", user.getEmail()
             ));
-        } catch (Exception e) {
+        } catch (org.springframework.security.core.AuthenticationException e) {
             logger.error("Login failed: ", e);
+            return ResponseEntity.status(401).body(Map.of("error", "Invalid email or password"));
+        } catch (java.util.NoSuchElementException e) {
+            logger.error("Login failed - user not found: ", e);
             return ResponseEntity.status(401).body(Map.of("error", "Invalid email or password"));
         }
     }

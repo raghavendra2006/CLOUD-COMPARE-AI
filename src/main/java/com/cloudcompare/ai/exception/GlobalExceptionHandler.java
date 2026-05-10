@@ -51,6 +51,7 @@ public class GlobalExceptionHandler {
      * Catch-all for unexpected system errors.
      * Never leaks stack traces to the client.
      */
+    @SuppressWarnings("java:S2221") // Intentional catch-all: this is the global fallback handler
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGlobalException(Exception ex) {
         log.error("Unhandled system exception: ", ex);

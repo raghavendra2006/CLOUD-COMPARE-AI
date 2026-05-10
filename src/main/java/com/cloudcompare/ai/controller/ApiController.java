@@ -1,6 +1,12 @@
 package com.cloudcompare.ai.controller;
 
-import com.cloudcompare.ai.dto.*;
+import com.cloudcompare.ai.dto.AiCompareRequest;
+import com.cloudcompare.ai.dto.AiToolResult;
+import com.cloudcompare.ai.dto.ApiResponse;
+import com.cloudcompare.ai.dto.CompareRequest;
+import com.cloudcompare.ai.dto.CompareResponse;
+import com.cloudcompare.ai.dto.Region;
+import com.cloudcompare.ai.dto.ServiceType;
 import com.cloudcompare.ai.service.CacheService;
 import com.cloudcompare.ai.service.GrokClientService;
 import com.cloudcompare.ai.service.MetaDataService;
@@ -9,9 +15,17 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * REST Controller — direct port of server.js + routes.js
@@ -76,7 +90,7 @@ public class ApiController {
 
             return ResponseEntity.ok(ApiResponse.success(response));
 
-        } catch (RuntimeException | java.io.IOException | InterruptedException err) {
+        } catch (RuntimeException | IOException | InterruptedException err) {
             log.error("Comparison failed: {}", err.getMessage());
             String errorMsg = err.getMessage();
             if (errorMsg != null && errorMsg.contains("YOUR_GROQ_API_KEYS_HERE")) {
@@ -121,7 +135,7 @@ public class ApiController {
                 "tools", grokResults
             )));
 
-        } catch (RuntimeException | java.io.IOException | InterruptedException err) {
+        } catch (RuntimeException | IOException | InterruptedException err) {
             log.error("AI Tool Analysis failed: {}", err.getMessage());
             return ResponseEntity.status(502).body(ApiResponse.error("AI Analysis failed: " + err.getMessage()));
         }
