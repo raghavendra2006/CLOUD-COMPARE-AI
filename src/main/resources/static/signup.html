@@ -10,12 +10,12 @@
     <style>
         @keyframes unfold { from { opacity: 0; transform: perspective(1200px) rotateX(-25deg) translateY(50px) scale(0.8); } to { opacity: 1; transform: perspective(1200px) rotateX(0) translateY(0) scale(1); } }
         @keyframes drift { from { transform: translateY(110vh) rotate(0deg); } to { transform: translateY(-110px) rotate(360deg); } }
-        @keyframes liquidBorder { 0%, 100% { border-color: rgba(212, 160, 23, 0.2); box-shadow: 0 0 20px rgba(212, 160, 23, 0.1); } 50% { border-color: rgba(251, 191, 36, 0.8); box-shadow: 0 0 40px rgba(212, 160, 23, 0.3); } }
+        @keyframes liquidBorder { 0%, 100% { border-color: rgba(0, 212, 170, 0.15); box-shadow: 0 0 20px rgba(0, 212, 170, 0.05); } 50% { border-color: rgba(0, 212, 170, 0.5); box-shadow: 0 0 40px rgba(124, 58, 237, 0.15); } }
         @keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         @keyframes slideIn { from { opacity: 0; transform: translateZ(30px) translateY(20px); } to { opacity: 1; transform: translateZ(30px) translateY(0); } }
 
-        body { margin: 0; background: #000; color: white; font-family: 'Inter', sans-serif; min-height: 100vh; }
+        body { margin: 0; background: #060b1e; color: white; font-family: 'Inter', sans-serif; min-height: 100vh; }
         
         .auth-container {
             min-height: 100vh;
@@ -47,7 +47,7 @@
             content: "";
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, transparent, rgba(212, 160, 23, 0.03), transparent);
+            background: linear-gradient(to bottom, transparent, rgba(0, 212, 170, 0.02), transparent);
             animation: scanline 3s linear infinite;
             pointer-events: none;
             z-index: 1;
@@ -56,10 +56,12 @@
         .auth-header { text-align: center; margin-bottom: 2rem; transform: translateZ(50px); }
         .auth-header .logo-icon {
             font-size: 3rem;
-            color: #d4a017;
             margin-bottom: 0.8rem;
             display: inline-block;
-            filter: drop-shadow(0 0 15px rgba(212, 160, 23, 0.6));
+            background: linear-gradient(135deg, #00d4aa, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 15px rgba(0, 212, 170, 0.4));
             animation: float 4s ease-in-out infinite;
         }
         .auth-header h2 { font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 0.5rem; }
@@ -71,8 +73,8 @@
         .form-control {
             width: 100%;
             padding: 1rem 1.25rem;
-            background: rgba(0, 0, 0, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(6, 11, 30, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 12px;
             color: white;
             font-family: inherit;
@@ -82,17 +84,17 @@
 
         .form-control:focus {
             outline: none;
-            border-color: #fbbf24;
-            background: rgba(0, 0, 0, 0.8);
-            box-shadow: 0 0 25px rgba(212, 160, 23, 0.2);
+            border-color: #00d4aa;
+            background: rgba(6, 11, 30, 0.95);
+            box-shadow: 0 0 25px rgba(0, 212, 170, 0.15);
             transform: scale(1.02);
         }
 
         .btn-auth {
             width: 100%;
             padding: 1.2rem;
-            background: linear-gradient(135deg, #d4a017, #fbbf24);
-            color: #1a1408;
+            background: linear-gradient(135deg, #00d4aa, #00b894);
+            color: #060b1e;
             border: none;
             border-radius: 14px;
             font-weight: 900;
@@ -105,13 +107,13 @@
             transform: translateZ(40px);
         }
 
-        .btn-auth:hover { transform: translateZ(60px) translateY(-5px); box-shadow: 0 20px 40px rgba(212, 160, 23, 0.5); }
+        .btn-auth:hover { transform: translateZ(60px) translateY(-5px); box-shadow: 0 20px 40px rgba(0, 212, 170, 0.35); }
         .btn-auth::after { content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); transition: 0.6s; }
         .btn-auth:hover::after { left: 100%; }
 
         .auth-footer { margin-top: 2rem; text-align: center; color: #64748b; transform: translateZ(20px); }
-        .auth-footer a { color: #fbbf24; text-decoration: none; font-weight: 800; transition: 0.3s; }
-        .auth-footer a:hover { color: white; text-shadow: 0 0 10px #fbbf24; }
+        .auth-footer a { color: #00d4aa; text-decoration: none; font-weight: 800; transition: 0.3s; }
+        .auth-footer a:hover { color: white; text-shadow: 0 0 10px #00d4aa; }
 
         .form-validation { font-size: 0.75rem; margin-top: 0.4rem; display: none; align-items: center; gap: 0.3rem; transform: translateZ(25px); }
         .form-validation.error { color: #fca5a5; display: flex; }
@@ -125,7 +127,7 @@
         .strength-bar.good { background: #60a5fa; width: 75%; }
         .strength-bar.strong { background: #22c55e; width: 100%; }
 
-        .password-requirements { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 1.2rem; margin-top: 1.2rem; transform: translateZ(20px); }
+        .password-requirements { background: rgba(6, 11, 30, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 1.2rem; margin-top: 1.2rem; transform: translateZ(20px); }
         .requirement { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem; color: #475569; font-size: 0.75rem; transition: all 0.3s; }
         .requirement i { font-size: 0.6rem; }
         .requirement.met { color: #86efac; }
@@ -137,13 +139,13 @@
 
         /* Dynamic Particle System */
         .particle-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-        .particle { position: absolute; background: #d4a017; border-radius: 50%; opacity: 0.4; animation: drift linear infinite; }
+        .particle { position: absolute; background: #7c3aed; border-radius: 50%; opacity: 0.4; animation: drift linear infinite; }
         
         .light-follow {
             position: fixed;
             width: 700px;
             height: 700px;
-            background: radial-gradient(circle, rgba(212, 160, 23, 0.08), transparent 70%);
+            background: radial-gradient(circle, rgba(0, 212, 170, 0.06), transparent 70%);
             border-radius: 50%;
             pointer-events: none;
             z-index: 1;
@@ -230,11 +232,8 @@
             const emailValidation = document.getElementById('emailValidation');
             const email = emailInput.value.trim();
 
-            console.log('📧 Checking email:', email);
-
             if (!email) {
                 emailValidation.style.display = 'none';
-                console.log('⚠️ Email is empty');
                 return true;
             }
 
@@ -243,14 +242,12 @@
                 emailValidation.classList.remove('success');
                 emailValidation.classList.add('error');
                 emailValidation.style.display = 'block';
-                console.log('❌ Email format invalid');
                 return false;
             } else {
                 emailValidation.innerHTML = '<i class="fas fa-check-circle"></i> Valid email';
                 emailValidation.classList.remove('error');
                 emailValidation.classList.add('success');
                 emailValidation.style.display = 'block';
-                console.log('✅ Email format valid');
                 return true;
             }
         }
@@ -273,14 +270,6 @@
             const hasSymbol = symbolRegex.test(password);
             const hasLetter = /[a-zA-Z]/.test(password);
 
-            console.log('🔐 Password requirements:', { 
-                length: password.length, 
-                hasLength, 
-                hasNumber, 
-                hasSymbol, 
-                hasLetter 
-            });
-
             // Update requirement indicators
             updateRequirement('req-length', hasLength);
             updateRequirement('req-number', hasNumber);
@@ -293,7 +282,6 @@
                 strengthText.className = 'strength-text';
                 strengthLabel.textContent = 'Enter a password';
                 passwordValidation.style.display = 'none';
-                console.log('⚠️ Password is empty');
                 return true;
             }
 
@@ -302,8 +290,6 @@
             if (hasNumber) strength++;
             if (hasSymbol) strength++;
             if (hasLetter) strength++;
-
-            console.log('📊 Password strength level:', strength);
 
             // Update UI based on strength
             strengthBar.className = 'strength-bar';
@@ -317,7 +303,6 @@
                 passwordValidation.classList.remove('success');
                 passwordValidation.classList.add('error');
                 passwordValidation.style.display = 'block';
-                console.log('❌ Password strength: WEAK (cannot submit)');
                 return false;
             } else if (strength < 3) {
                 strengthBar.classList.add('fair');
@@ -327,7 +312,6 @@
                 passwordValidation.classList.remove('success');
                 passwordValidation.classList.add('error');
                 passwordValidation.style.display = 'block';
-                console.log('❌ Password strength: FAIR (cannot submit)');
                 return false;
             } else if (strength < 4) {
                 strengthBar.classList.add('good');
@@ -337,7 +321,6 @@
                 passwordValidation.classList.remove('error');
                 passwordValidation.classList.add('success');
                 passwordValidation.style.display = 'block';
-                console.log('✅ Password strength: GOOD (can submit)');
                 return true;
             } else {
                 strengthBar.classList.add('strong');
@@ -347,7 +330,6 @@
                 passwordValidation.classList.remove('error');
                 passwordValidation.classList.add('success');
                 passwordValidation.style.display = 'block';
-                console.log('✅ Password strength: STRONG (can submit)');
                 return true;
             }
         }
@@ -366,14 +348,9 @@
             const btn = document.getElementById('signupBtn');
             const statusMsg = document.getElementById('statusMsg');
             
-            console.log('📋 Signup form submitted');
-            
             // Validate email
-            console.log('🔍 Validating email...');
             const emailValid = validateSignupEmail();
-            console.log('✉️ Email validation result:', emailValid);
             if (!emailValid) {
-                console.log('❌ Email validation failed');
                 statusMsg.textContent = 'Please enter a valid email address';
                 statusMsg.classList.remove('alert-success');
                 statusMsg.classList.add('alert-error');
@@ -382,11 +359,8 @@
             }
 
             // Validate password strength
-            console.log('🔍 Validating password strength...');
             const passwordValid = checkPasswordStrength();
-            console.log('🔐 Password validation result:', passwordValid);
             if (!passwordValid) {
-                console.log('❌ Password validation failed');
                 statusMsg.textContent = 'Password must be at least Good strength (3+ requirements)';
                 statusMsg.classList.remove('alert-success');
                 statusMsg.classList.add('alert-error');
@@ -403,11 +377,8 @@
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
 
-            console.log('📝 Form data:', { name, email, password: '***' });
-
             // Final validation
             if (!name || name.length < 2) {
-                console.log('❌ Name validation failed');
                 statusMsg.textContent = 'Please enter a valid full name';
                 statusMsg.classList.add('alert-error');
                 statusMsg.style.display = 'block';
@@ -417,23 +388,18 @@
             }
 
             try {
-                console.log('🚀 Sending signup request to /api/auth/signup...');
                 const response = await fetch('/api/auth/signup', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, email, password })
                 });
 
-                console.log('📡 Response status:', response.status);
                 const text = await response.text();
-                console.log('📦 Response text:', text);
-
                 let data;
                 try { data = JSON.parse(text); } catch(e) { data = {}; }
 
                 if (response.ok) {
                     createSuccessBurst();
-                    console.log('✅ Signup successful');
                     statusMsg.textContent = 'Account created successfully! Redirecting...';
                     statusMsg.classList.add('alert-success');
                     statusMsg.style.display = 'block';
@@ -443,7 +409,6 @@
                     }, 1500);
                 } else {
                     triggerErrorShake();
-                    console.log('❌ Signup failed:', data.error || text);
                     const errorMsg = data.error || data.message || `Signup failed (${response.status})`;
                     statusMsg.textContent = errorMsg;
                     statusMsg.classList.add('alert-error');
@@ -452,7 +417,6 @@
                     btn.disabled = false;
                 }
             } catch (err) {
-                console.error('❌ Network error:', err);
                 statusMsg.textContent = 'Unable to connect to the server. Please make sure the backend is running.';
                 statusMsg.classList.add('alert-error');
                 statusMsg.style.display = 'block';
@@ -504,7 +468,7 @@
                 p.style.setProperty('--ty', `${(Math.random() - 0.5) * 600}px`);
                 p.style.left = '50%';
                 p.style.top = '50%';
-                p.style.background = Math.random() > 0.5 ? '#d4a017' : '#fbbf24';
+                p.style.background = Math.random() > 0.5 ? '#00d4aa' : '#7c3aed';
                 document.body.appendChild(p);
                 setTimeout(() => p.remove(), 1000);
             }

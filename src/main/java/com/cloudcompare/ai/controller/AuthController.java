@@ -10,15 +10,15 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 @RestController
@@ -27,19 +27,19 @@ public class AuthController {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
-    private final AuthenticationManager authenticationManager;
     private final AuthService authService;
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthController(AuthenticationManager authenticationManager,
-                          AuthService authService,
+    public AuthController(AuthService authService,
                           JwtUtil jwtUtil,
-                          UserRepository userRepository) {
-        this.authenticationManager = authenticationManager;
+                          UserRepository userRepository,
+                          PasswordEncoder passwordEncoder) {
         this.authService = authService;
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/signup")
@@ -54,19 +54,25 @@ public class AuthController {
         try {
             logger.info("Login request received for email: {}", loginRequest.getEmail());
 
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+            // Find user in database
+            UserEntity user = userRepository.findByEmail(loginRequest.getEmail()).orElse(null);
+            if (user == null) {
+                logger.warn("Login failed - user not found: {}", loginRequest.getEmail());
+                return ResponseEntity.status(401).body(Map.of("error", "Invalid email or password"));
+            }
 
-            logger.info("Authentication principal: {}", authentication.getPrincipal());
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            
+            // Verify password using BCrypt
+            if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+                logger.warn("Login failed - wrong password for: {}", loginRequest.getEmail());
+                return ResponseEntity.status(401).body(Map.of("error", "Invalid email or password"));
+            }
+
+            // Generate JWT token
+            UserDetails userDetails = User.withUsername(user.getEmail())
+                    .password(user.getPassword())
+                    .authorities(new ArrayList<>())
+                    .build();
             String jwt = jwtUtil.generateToken(userDetails);
-            logger.info("JWT generated successfully");
-
-            UserEntity user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> {
-                logger.error("User not found in repository after successful auth: {}", loginRequest.getEmail());
-                return new java.util.NoSuchElementException("User not found");
-            });
 
             logger.info("Login successful for: {}", loginRequest.getEmail());
             return ResponseEntity.ok(Map.of(
@@ -74,12 +80,9 @@ public class AuthController {
                     "name", user.getName(),
                     "email", user.getEmail()
             ));
-        } catch (org.springframework.security.core.AuthenticationException e) {
-            logger.error("Login failed: ", e);
-            return ResponseEntity.status(401).body(com.cloudcompare.ai.dto.ApiResponse.error("Invalid email or password"));
-        } catch (java.util.NoSuchElementException e) {
-            logger.error("Login failed - user not found: ", e);
-            return ResponseEntity.status(401).body(com.cloudcompare.ai.dto.ApiResponse.error("Invalid email or password"));
+        } catch (Exception e) {
+            logger.error("Login error for {}: [{}] {}", loginRequest.getEmail(), e.getClass().getName(), e.getMessage());
+            return ResponseEntity.status(500).body(Map.of("error", "Login failed. Please try again."));
         }
     }
 }

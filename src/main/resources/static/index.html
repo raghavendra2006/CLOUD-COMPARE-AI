@@ -3,149 +3,346 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CloudCompare AI - Multi-Cloud Optimization</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>CloudCompare AI — Smart Cloud & AI Discovery Platform</title>
+    <meta name="description" content="Compare and analyze leading AI tools, cloud platforms, and modern software solutions in one intelligent platform.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { margin: 0; background: #000; color: white; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
-        .landing-container {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            background: radial-gradient(circle at center, #111 0%, #000 100%);
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #060b1e;
+            color: #e2e8f0;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
-        
+
+        /* ── NAV ── */
         .navbar {
-            padding: 2rem 4rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            z-index: 10;
+            padding: 1.25rem 3rem;
+            position: relative;
+            z-index: 20;
         }
-        
         .nav-logo {
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-weight: 800;
-            font-size: 1.5rem;
-            color: #d4a017;
-        }
-        
-        .nav-auth {
-            display: flex;
-            gap: 1rem;
-        }
-        
-        .btn-auth {
-            padding: 0.8rem 1.5rem;
-            border-radius: 8px;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: #fff;
             text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s;
         }
-        
-        .btn-signup {
-            background: transparent;
-            color: #d4a017;
-            border: 1px solid rgba(212, 160, 23, 0.3);
-        }
-        
-        .btn-signup:hover {
-            background: rgba(212, 160, 23, 0.1);
-            border-color: #d4a017;
-        }
-        
-        .btn-login {
-            background: #d4a017;
-            color: black;
-            border: none;
-            box-shadow: 0 0 20px rgba(212, 160, 23, 0.3);
-        }
-        
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 30px rgba(212, 160, 23, 0.5);
-        }
-        
-        .hero {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            position: relative;
-            z-index: 5;
-        }
-        
-        .hero-content h1 {
-            font-size: 5rem;
-            font-weight: 800;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, #d4a017, #f5d060);
+        .nav-logo i {
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #00d4aa, #7c3aed);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        
-        .hero-content p {
-            font-size: 1.25rem;
-            color: #a89968;
-            max-width: 600px;
-            margin: 0 auto 2rem;
+        .nav-actions { display: flex; gap: 0.75rem; align-items: center; }
+        .btn-nav {
+            padding: 0.6rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            cursor: pointer;
         }
-        
-        .floating-elements {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
+        .btn-login-nav {
+            background: transparent;
+            color: #e2e8f0;
+            border: 1px solid rgba(255,255,255,0.15);
         }
-        
-        .element {
+        .btn-login-nav:hover { border-color: #00d4aa; color: #00d4aa; }
+        .btn-signup-nav {
+            background: linear-gradient(135deg, #00d4aa, #00b894);
+            color: #060b1e;
+            border: none;
+        }
+        .btn-signup-nav:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,212,170,0.3); }
+
+        /* ── HERO ── */
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            min-height: calc(100vh - 180px);
+            padding: 0 3rem;
+            position: relative;
+        }
+        .hero-left { z-index: 10; }
+        .hero-tag {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #00d4aa;
+            margin-bottom: 1.5rem;
+        }
+        .hero-title {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+        .hero-title .gradient-text {
+            background: linear-gradient(135deg, #7c3aed, #00d4aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-description {
+            font-size: 1.1rem;
+            color: #94a3b8;
+            max-width: 480px;
+            line-height: 1.7;
+            margin-bottom: 2rem;
+        }
+        .hero-btns { display: flex; gap: 1rem; align-items: center; }
+        .btn-primary {
+            padding: 0.9rem 2rem;
+            background: linear-gradient(135deg, #00d4aa, #00b894);
+            color: #060b1e;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,212,170,0.35); }
+        .btn-outline {
+            padding: 0.9rem 2rem;
+            background: transparent;
+            color: #e2e8f0;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .btn-outline:hover { border-color: #7c3aed; color: #c4b5fd; }
+
+        /* ── FLOATING CARDS ── */
+        .hero-right {
+            position: relative;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .orb {
             position: absolute;
-            background: rgba(212, 160, 23, 0.05);
-            border: 1px solid rgba(212, 160, 23, 0.1);
+            width: 420px;
+            height: 420px;
             border-radius: 50%;
-            filter: blur(40px);
-            animation: float 20s infinite linear;
+            background: radial-gradient(circle, rgba(124,58,237,0.25) 0%, rgba(124,58,237,0.05) 50%, transparent 70%);
+            border: 1px solid rgba(124,58,237,0.15);
+            animation: orbPulse 6s ease-in-out infinite;
         }
-        
-        @keyframes float {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            50% { transform: translate(100px, 50px) rotate(180deg); }
-            100% { transform: translate(0, 0) rotate(360deg); }
+        @keyframes orbPulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+        }
+        .badge-text {
+            position: absolute;
+            top: -20px;
+            right: -10px;
+            background: rgba(15,23,42,0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: #fbbf24;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(10px);
+            white-space: nowrap;
+            z-index: 15;
+        }
+        .cloud-card {
+            position: absolute;
+            background: rgba(15,23,42,0.7);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #e2e8f0;
+            backdrop-filter: blur(15px);
+            transition: all 0.4s;
+            cursor: default;
+            z-index: 10;
+            animation: cardFloat 5s ease-in-out infinite;
+        }
+        .cloud-card:hover { transform: translateY(-5px) scale(1.05); border-color: rgba(0,212,170,0.3); }
+        .cloud-card img, .cloud-card .card-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+        @keyframes cardFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        /* Position each card */
+        .card-aws      { top: 5%;  left: 30%;  animation-delay: 0s; }
+        .card-azure     { top: 12%; right: 5%; animation-delay: -1s; }
+        .card-gcloud    { top: 40%; left: 10%; animation-delay: -2s; }
+        .card-anthropic { top: 55%; left: 25%; animation-delay: -3s; }
+        .card-gemini    { bottom: 15%; left: 30%; animation-delay: -2.5s; }
+        .card-alibaba   { top: 30%; right: 0%; animation-delay: -1.5s; }
+        .card-oracle    { top: 50%; right: -5%; animation-delay: -4s; }
+        .card-groq      { bottom: 20%; right: 10%; animation-delay: -3.5s; }
+
+        .card-icon.aws { color: #ff9900; }
+        .card-icon.azure { color: #0078d4; }
+        .card-icon.gcloud { color: #4285f4; }
+        .card-icon.alibaba { color: #ff6a00; }
+        .card-icon.oracle { color: #f80000; }
+        .card-icon.groq { color: #f55036; }
+        .card-icon.anthropic { color: #d4a574; }
+        .card-icon.gemini { color: #8b5cf6; }
+
+        /* ── STATS BAR ── */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border-top: 1px solid rgba(255,255,255,0.06);
+            background: rgba(10,15,35,0.6);
+            backdrop-filter: blur(10px);
+            padding: 2rem 3rem;
+        }
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 0 1rem;
+        }
+        .stat-item:not(:last-child) { border-right: 1px solid rgba(255,255,255,0.06); }
+        .stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+        .stat-icon.cat { background: rgba(99,102,241,0.15); color: #818cf8; }
+        .stat-icon.tool { background: rgba(0,212,170,0.12); color: #00d4aa; }
+        .stat-icon.cloud { background: rgba(56,189,248,0.12); color: #38bdf8; }
+        .stat-icon.live { background: rgba(251,191,36,0.12); color: #fbbf24; }
+        .stat-number { font-size: 1.5rem; font-weight: 800; color: #fff; }
+        .stat-label { font-size: 0.8rem; color: #64748b; }
+
+        /* ── BG GRADIENTS ── */
+        .bg-glow {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .glow-1 { width: 600px; height: 600px; top: -10%; left: -5%; background: rgba(124,58,237,0.12); }
+        .glow-2 { width: 500px; height: 500px; bottom: 10%; right: -5%; background: rgba(0,212,170,0.08); }
+        .glow-3 { width: 400px; height: 400px; top: 40%; left: 40%; background: rgba(99,102,241,0.06); }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 900px) {
+            .hero { grid-template-columns: 1fr; text-align: center; padding: 2rem 1.5rem; }
+            .hero-right { display: none; }
+            .hero-description { margin: 0 auto 2rem; }
+            .hero-btns { justify-content: center; }
+            .stats-bar { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+            .stat-item:nth-child(2) { border-right: none; }
+            .navbar { padding: 1rem 1.5rem; }
+        }
+        @media (max-width: 480px) {
+            .stats-bar { grid-template-columns: 1fr; }
+            .stat-item { border-right: none !important; }
         }
     </style>
 </head>
 <body>
-    <div class="landing-container">
-        <div class="floating-elements">
-            <div class="element" style="width: 400px; height: 400px; top: -10%; left: -10%;"></div>
-            <div class="element" style="width: 500px; height: 500px; bottom: -20%; right: -10%; animation-delay: -5s;"></div>
+    <div class="bg-glow glow-1"></div>
+    <div class="bg-glow glow-2"></div>
+    <div class="bg-glow glow-3"></div>
+
+    <nav class="navbar">
+        <a href="index.html" class="nav-logo">
+            <i class="fas fa-cloud"></i>
+            <span>CloudCompare AI</span>
+        </a>
+        <div class="nav-actions">
+            <a href="login.html" class="btn-nav btn-login-nav">Login</a>
+            <a href="signup.html" class="btn-nav btn-signup-nav">Signup</a>
         </div>
-        
-        <nav class="navbar">
-            <div class="nav-logo">
-                <i class="fas fa-cloud"></i>
-                <span>CloudCompare AI</span>
+    </nav>
+
+    <main class="hero">
+        <div class="hero-left">
+            <span class="hero-tag">Smart Cloud & AI Discovery Platform</span>
+            <h1 class="hero-title">
+                Compare.<br>
+                Analyze.<br>
+                <span class="gradient-text">Choose Better.</span>
+            </h1>
+            <p class="hero-description">Discover and compare leading AI tools, cloud platforms, and modern software solutions in one intelligent platform.</p>
+            <div class="hero-btns">
+                <a href="login.html" class="btn-primary">Start Comparing <i class="fas fa-arrow-right"></i></a>
+                <a href="signup.html" class="btn-outline">Explore AI Tools</a>
             </div>
-            <div class="nav-auth">
-                <a href="signup.html" class="btn-auth btn-signup">Sign Up</a>
-                <a href="login.html" class="btn-auth btn-login">Login</a>
-            </div>
-        </nav>
-        
-        <main class="hero">
-            <div class="hero-content">
-                <h1>The Future of Cloud</h1>
-                <p>Architecting high-performance multi-cloud infrastructure with AI-driven precision. Compare, optimize, and deploy with confidence.</p>
-                <a href="login.html" class="btn-auth btn-login" style="padding: 1.2rem 3rem; font-size: 1.1rem;">Get Started Now</a>
-            </div>
-        </main>
-    </div>
+        </div>
+        <div class="hero-right">
+            <div class="badge-text"><i class="fas fa-star"></i> 5000+ AI & Cloud Services Compared</div>
+            <div class="orb"></div>
+            <div class="cloud-card card-aws"><span class="card-icon aws"><i class="fab fa-aws"></i></span> AWS</div>
+            <div class="cloud-card card-azure"><span class="card-icon azure"><i class="fab fa-microsoft"></i></span> Azure</div>
+            <div class="cloud-card card-gcloud"><span class="card-icon gcloud"><i class="fab fa-google"></i></span> Google Cloud</div>
+            <div class="cloud-card card-anthropic"><span class="card-icon anthropic"><i class="fas fa-brain"></i></span> AI Anthropic</div>
+            <div class="cloud-card card-gemini"><span class="card-icon gemini"><i class="fas fa-gem"></i></span> Gemini</div>
+            <div class="cloud-card card-alibaba"><span class="card-icon alibaba"><i class="fas fa-cloud"></i></span> Alibaba Cloud</div>
+            <div class="cloud-card card-oracle"><span class="card-icon oracle"><i class="fas fa-database"></i></span> Oracle</div>
+            <div class="cloud-card card-groq"><span class="card-icon groq"><i class="fas fa-bolt"></i></span> groq</div>
+        </div>
+    </main>
+
+    <section class="stats-bar">
+        <div class="stat-item">
+            <div class="stat-icon cat"><i class="fas fa-th-large"></i></div>
+            <div><div class="stat-number">500+</div><div class="stat-label">AI Categories</div></div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-icon tool"><i class="fas fa-layer-group"></i></div>
+            <div><div class="stat-number">10K+</div><div class="stat-label">Tool Comparisons</div></div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-icon cloud"><i class="fas fa-cloud"></i></div>
+            <div><div class="stat-number">50+</div><div class="stat-label">Cloud Providers</div></div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-icon live"><i class="fas fa-chart-line"></i></div>
+            <div><div class="stat-number">Real-Time</div><div class="stat-label">Insights</div></div>
+        </div>
+    </section>
 </body>
 </html>

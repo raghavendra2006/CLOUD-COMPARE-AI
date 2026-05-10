@@ -1607,14 +1607,14 @@ function displayAiRecommendations(tools) {
 
     tools.forEach((tool, index) => {
         let rankBadgeStyle = `background: rgba(148, 163, 184, 0.2); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.5);`;
-        if (index === 0) rankBadgeStyle = `background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.2)); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.5);`;
-        else if (index === 1) rankBadgeStyle = `background: linear-gradient(135deg, rgba(148, 163, 184, 0.2), rgba(100, 116, 139, 0.2)); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.5);`;
-        else if (index === 2) rankBadgeStyle = `background: linear-gradient(135deg, rgba(205, 127, 50, 0.2), rgba(184, 115, 51, 0.2)); color: #cd7f32; border: 1px solid rgba(205, 127, 50, 0.5);`;
+        if (index === 0) rankBadgeStyle = `background: linear-gradient(135deg, rgba(0, 212, 170, 0.2), rgba(0, 184, 148, 0.2)); color: #00d4aa; border: 1px solid rgba(0, 212, 170, 0.5);`;
+        else if (index === 1) rankBadgeStyle = `background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(139, 92, 246, 0.2)); color: #a78bfa; border: 1px solid rgba(124, 58, 237, 0.5);`;
+        else if (index === 2) rankBadgeStyle = `background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(96, 165, 250, 0.2)); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.5);`;
 
         // Resolve AI tool URL
         const toolUrl = getAiToolUrl(tool.tool_name);
         const tryToolBtnHtml = toolUrl
-            ? `<a href="${toolUrl}" target="_blank" rel="noopener noreferrer" class="visit-service-btn" style="border-color: rgba(251, 191, 36, 0.5); color: #fbbf24;">
+            ? `<a href="${toolUrl}" target="_blank" rel="noopener noreferrer" class="visit-service-btn" style="border-color: rgba(0, 212, 170, 0.5); color: #00d4aa;">
                    <i class="fas fa-external-link-alt"></i> Try Tool
                </a>`
             : '';
@@ -1627,7 +1627,8 @@ function displayAiRecommendations(tools) {
             </div>
             <div class="recommendation-content">
                 <div class="recommendation-platform">
-                    <h3 style="flex-wrap: wrap;">${tool.tool_name} <span style="font-size: 0.8em; color: #a89968; font-weight: normal;">by ${tool.provider}</span></h3>
+                    <h3 style="flex-wrap: wrap;">${tool.tool_name} <span style="font-size: 0.8em; color: #94a3b8; font-weight: normal;">by ${tool.provider}</span></h3>
+                </div>
                 </div>
                 <p style="color: #e2e8f0; font-size: 0.95rem; line-height: 1.5; margin: 0.5rem 0;">${tool.description}</p>
                 <div class="recommendation-stats" style="margin-top: auto; flex-wrap: wrap; gap: 1rem;">
@@ -1637,7 +1638,8 @@ function displayAiRecommendations(tools) {
                     </div>
                     <div class="stat-item" style="text-align: left; flex: 1; min-width: 120px;">
                         <span class="stat-label">Pricing</span>
-                        <span class="stat-value" style="font-size: 1rem; color: #fbbf24;">${tool.pricing}</span>
+                        <span class="stat-value" style="font-size: 1rem; color: #00d4aa;">${tool.pricing}</span>
+                    </div>
                     </div>
                     <div class="stat-item" style="text-align: right;">
                         <span class="stat-label">Rating</span>
@@ -1660,17 +1662,17 @@ function displayAiRecommendations(tools) {
         const data = tools.map(t => t.score);
         
         const bgColors = [
-            'rgba(251, 191, 36, 0.6)',
-            'rgba(148, 163, 184, 0.6)',
-            'rgba(205, 127, 50, 0.6)',
+            'rgba(0, 212, 170, 0.6)',
+            'rgba(124, 58, 237, 0.6)',
             'rgba(59, 130, 246, 0.6)',
+            'rgba(251, 191, 36, 0.6)',
             'rgba(16, 185, 129, 0.6)'
         ];
         const borderColors = [
-            'rgba(251, 191, 36, 1)',
-            'rgba(148, 163, 184, 1)',
-            'rgba(205, 127, 50, 1)',
+            'rgba(0, 212, 170, 1)',
+            'rgba(124, 58, 237, 1)',
             'rgba(59, 130, 246, 1)',
+            'rgba(251, 191, 36, 1)',
             'rgba(16, 185, 129, 1)'
         ];
 
@@ -1704,12 +1706,12 @@ function displayAiRecommendations(tools) {
                     x: {
                         beginAtZero: true,
                         max: 10,
-                        grid: { color: "rgba(212, 160, 23, 0.08)" },
-                        ticks: { color: "#a89968" }
+                        grid: { color: "rgba(0, 212, 170, 0.06)" },
+                        ticks: { color: "#94a3b8" }
                     },
                     y: {
                         grid: { display: false },
-                        ticks: { color: "#a89968", font: { size: 12 } }
+                        ticks: { color: "#94a3b8", font: { size: 12 } }
                     }
                 }
             }
@@ -1741,8 +1743,8 @@ function displayAiRecommendations(tools) {
         localStorage.setItem('cc-theme', isLight ? 'light' : 'dark');
 
         // Update Chart.js grid/tick colors for the new theme
-        const tickColor = isLight ? '#6b5c3e' : '#a89968';
-        const gridColor = isLight ? 'rgba(184,134,11,0.08)' : 'rgba(212,160,23,0.08)';
+        const tickColor = isLight ? '#475569' : '#94a3b8';
+        const gridColor = isLight ? 'rgba(0,212,170,0.06)' : 'rgba(0,212,170,0.06)';
         [costChartInstance, performanceChartInstance, rankingChartInstance,
             distributionChartInstance, valueChartInstance, popularityChartInstance,
             trendChartInstance, aiRatingChartInstance].forEach(chart => {

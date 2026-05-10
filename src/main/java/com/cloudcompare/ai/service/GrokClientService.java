@@ -104,8 +104,8 @@ public class GrokClientService {
     public List<AiToolResult> fetchAiToolsComparisonFromGrok(String purpose) throws IOException, InterruptedException {
         String apiKey = getNextApiKey();
         if ("YOUR_GROQ_API_KEYS_HERE".equals(apiKey) || apiKey.isEmpty()) {
-            log.info("Using mock Groq response for AI tools because API key is placeholder.");
-            return mockDataService.getMockAiTools();
+            log.info("Using purpose-aware mock data for AI tools. Purpose: {}", purpose);
+            return mockDataService.getMockAiToolsForPurpose(purpose);
         }
 
         String prompt = buildAiPrompt(purpose);
@@ -119,8 +119,8 @@ public class GrokClientService {
      */
     @SuppressWarnings("unused")
     public List<AiToolResult> fetchAiToolsFallback(String purpose, Throwable t) {
-        log.warn("Groq API Circuit Breaker tripped for AI Tools. Falling back. Reason: {}", t.getMessage(), t);
-        return mockDataService.getMockAiTools();
+        log.warn("Groq API Circuit Breaker tripped for AI Tools. Falling back to purpose-aware mock data. Reason: {}", t.getMessage(), t);
+        return mockDataService.getMockAiToolsForPurpose(purpose);
     }
 
     private String callGroqApi(String prompt, String apiKey) throws IOException, InterruptedException {

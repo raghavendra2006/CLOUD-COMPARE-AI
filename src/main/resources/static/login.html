@@ -10,12 +10,12 @@
     <style>
         @keyframes unfold { from { opacity: 0; transform: perspective(1200px) rotateX(-25deg) translateY(50px) scale(0.8); } to { opacity: 1; transform: perspective(1200px) rotateX(0) translateY(0) scale(1); } }
         @keyframes drift { from { transform: translateY(110vh) rotate(0deg); } to { transform: translateY(-110px) rotate(360deg); } }
-        @keyframes liquidBorder { 0%, 100% { border-color: rgba(212, 160, 23, 0.2); box-shadow: 0 0 20px rgba(212, 160, 23, 0.1); } 50% { border-color: rgba(251, 191, 36, 0.8); box-shadow: 0 0 40px rgba(212, 160, 23, 0.3); } }
+        @keyframes liquidBorder { 0%, 100% { border-color: rgba(0, 212, 170, 0.15); box-shadow: 0 0 20px rgba(0, 212, 170, 0.05); } 50% { border-color: rgba(0, 212, 170, 0.5); box-shadow: 0 0 40px rgba(124, 58, 237, 0.15); } }
         @keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         @keyframes slideIn { from { opacity: 0; transform: translateZ(30px) translateY(20px); } to { opacity: 1; transform: translateZ(30px) translateY(0); } }
 
-        body { margin: 0; background: #000; color: white; font-family: 'Inter', sans-serif; min-height: 100vh; }
+        body { margin: 0; background: #060b1e; color: white; font-family: 'Inter', sans-serif; min-height: 100vh; }
         
         .auth-container {
             min-height: 100vh;
@@ -47,7 +47,7 @@
             content: "";
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, transparent, rgba(212, 160, 23, 0.03), transparent);
+            background: linear-gradient(to bottom, transparent, rgba(0, 212, 170, 0.02), transparent);
             animation: scanline 3s linear infinite;
             pointer-events: none;
             z-index: 1;
@@ -56,10 +56,12 @@
         .auth-header { text-align: center; margin-bottom: 2.5rem; transform: translateZ(50px); }
         .auth-header .logo-icon {
             font-size: 3rem;
-            color: #d4a017;
             margin-bottom: 1rem;
             display: inline-block;
-            filter: drop-shadow(0 0 15px rgba(212, 160, 23, 0.6));
+            background: linear-gradient(135deg, #00d4aa, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 15px rgba(0, 212, 170, 0.4));
             animation: float 4s ease-in-out infinite;
         }
         .auth-header h2 { font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 0.5rem; }
@@ -71,8 +73,8 @@
         .form-control {
             width: 100%;
             padding: 1.1rem 1.3rem;
-            background: rgba(0, 0, 0, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(6, 11, 30, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 14px;
             color: white;
             font-family: inherit;
@@ -82,17 +84,17 @@
 
         .form-control:focus {
             outline: none;
-            border-color: #fbbf24;
-            background: rgba(0, 0, 0, 0.8);
-            box-shadow: 0 0 25px rgba(212, 160, 23, 0.2);
+            border-color: #00d4aa;
+            background: rgba(6, 11, 30, 0.95);
+            box-shadow: 0 0 25px rgba(0, 212, 170, 0.15);
             transform: scale(1.02);
         }
 
         .btn-auth {
             width: 100%;
             padding: 1.2rem;
-            background: linear-gradient(135deg, #d4a017, #fbbf24);
-            color: #1a1408;
+            background: linear-gradient(135deg, #00d4aa, #00b894);
+            color: #060b1e;
             border: none;
             border-radius: 14px;
             font-weight: 900;
@@ -105,17 +107,17 @@
             transform: translateZ(40px);
         }
 
-        .btn-auth:hover { transform: translateZ(60px) translateY(-5px); box-shadow: 0 20px 40px rgba(212, 160, 23, 0.5); }
+        .btn-auth:hover { transform: translateZ(60px) translateY(-5px); box-shadow: 0 20px 40px rgba(0, 212, 170, 0.35); }
         .btn-auth::after { content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); transition: 0.6s; }
         .btn-auth:hover::after { left: 100%; }
 
         .auth-footer { margin-top: 2.5rem; text-align: center; color: #64748b; transform: translateZ(20px); }
-        .auth-footer a { color: #fbbf24; text-decoration: none; font-weight: 800; transition: 0.3s; }
-        .auth-footer a:hover { color: white; text-shadow: 0 0 10px #fbbf24; }
+        .auth-footer a { color: #00d4aa; text-decoration: none; font-weight: 800; transition: 0.3s; }
+        .auth-footer a:hover { color: white; text-shadow: 0 0 10px #00d4aa; }
 
         .forgot-password-link { text-align: right; margin-top: -0.5rem; margin-bottom: 1.5rem; transform: translateZ(25px); }
         .forgot-password-link a { color: #475569; font-size: 0.85rem; cursor: pointer; transition: 0.3s; }
-        .forgot-password-link a:hover { color: #fbbf24; }
+        .forgot-password-link a:hover { color: #00d4aa; }
 
         .alert { display: none; padding: 1rem; border-radius: 12px; margin-bottom: 2rem; font-size: 0.95rem; animation: slideIn 0.4s ease-out; }
         .alert-error { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; }
@@ -123,19 +125,31 @@
 
         /* Dynamic Particle System */
         .particle-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-        .particle { position: absolute; background: #d4a017; border-radius: 50%; opacity: 0.4; animation: drift linear infinite; }
+        .particle { position: absolute; background: #7c3aed; border-radius: 50%; opacity: 0.4; animation: drift linear infinite; }
         
         .light-follow {
             position: fixed;
             width: 600px;
             height: 600px;
-            background: radial-gradient(circle, rgba(212, 160, 23, 0.08), transparent 70%);
+            background: radial-gradient(circle, rgba(0, 212, 170, 0.06), transparent 70%);
             border-radius: 50%;
             pointer-events: none;
             z-index: 1;
             transform: translate(-50%, -50%);
             transition: left 0.15s ease-out, top 0.15s ease-out;
         }
+
+        /* Modal Styles */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s; }
+        .modal.active { opacity: 1; visibility: visible; }
+        .modal .modal-content { background: rgba(15,23,42,0.95); border: 1px solid rgba(0,212,170,0.15); border-radius: 20px; padding: 2rem; width: 90%; max-width: 420px; backdrop-filter: blur(20px); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .modal-header h3 { font-size: 1.3rem; }
+        .modal-close { background: none; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer; }
+        .modal-description { color: #94a3b8; margin-bottom: 1.5rem; font-size: 0.9rem; }
+        .form-validation { font-size: 0.75rem; margin-top: 0.4rem; display: none; align-items: center; gap: 0.3rem; }
+        .form-validation.error { color: #fca5a5; display: flex; }
+        .form-validation.success { color: #86efac; display: flex; }
     </style>
 </head>
 <body>
@@ -292,7 +306,6 @@
             statusMsg.style.display = 'none';
 
             try {
-                // In a real application, this would send to your backend
                 const response = await fetch('/api/auth/forgot-password', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -300,7 +313,6 @@
                 });
 
                 if (response.status === 404) {
-                    // Email not found - but don't reveal this for security
                     statusMsg.textContent = 'If an account exists with this email, you will receive a password reset link.';
                     statusMsg.classList.add('alert-success');
                     statusMsg.style.display = 'block';
@@ -425,7 +437,7 @@
                 p.style.setProperty('--ty', `${(Math.random() - 0.5) * 600}px`);
                 p.style.left = '50%';
                 p.style.top = '50%';
-                p.style.background = Math.random() > 0.5 ? '#d4a017' : '#fbbf24';
+                p.style.background = Math.random() > 0.5 ? '#00d4aa' : '#7c3aed';
                 document.body.appendChild(p);
                 setTimeout(() => p.remove(), 1000);
             }
