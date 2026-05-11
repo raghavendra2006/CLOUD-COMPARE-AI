@@ -9,8 +9,8 @@ pipeline {
         
         // --- EC2 Deployment Properties ---
         EC2_USER = 'ubuntu'
-        EC2_IP = '18.209.5.124' // Update this to your target EC2 IP if different
-        SSH_CREDENTIALS_ID = 'ec2-pem-key'
+        EC2_IP = '3.80.62.223' // Update this to your target EC2 IP if different
+        SSH_CREDENTIALS_ID = 'ec2-pem-keyyyy'
     }
 
     tools {

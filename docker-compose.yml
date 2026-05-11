@@ -1,13 +1,14 @@
 services:
   app:
-    build: .
+    image: ${DOCKER_IMAGE:-raghavendra76/cloudcompare-ai:latest}
     container_name: cloudcompare-ai
+    restart: always
     ports:
       - "5000:5000"
     environment:
-      - DB_HOST=host.docker.internal
-      - DB_NAME=cloudcompare
-      - DB_USER=root
+      - DB_HOST=${DB_HOST:-host.docker.internal}
+      - DB_NAME=${DB_NAME:-cloudcompare}
+      - DB_USER=${DB_USER:-root}
       - DB_PASSWORD=${DB_PASSWORD}
       - GROK_API_KEYS=${GROK_API_KEYS}
       - JWT_SECRET=${JWT_SECRET}
