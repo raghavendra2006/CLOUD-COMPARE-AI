@@ -641,7 +641,12 @@ function displayRecommendations(services) {
             </div>
             <div class="recommendation-content">
                 <div class="recommendation-platform">
-                    <h3>${rec.platform} - ${rec.service_name}</h3>
+                    <h3 style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
+                        <span style="color:${platformColors[rec.platform] || '#3b82f6'}; font-size:1.15rem; display:inline-flex; align-items:center; justify-content:center;">
+                            <i class="${platformIcons[rec.platform] || 'fas fa-cloud'}"></i>
+                        </span>
+                        <span>${rec.platform} - ${rec.service_name}</span>
+                    </h3>
                 </div>
                 <div class="recommendation-stats">
                     <div class="stat-item" style="text-align: left;">
@@ -1348,7 +1353,7 @@ function displayTable(services) {
             <td><span class="rank-badge ${rankClass}">#${s.rank}</span></td>
             <td>
                 <span class="platform-badge" style="background: ${platformColors[s.platform]}">
-                    ${s.platform}
+                    <i class="${platformIcons[s.platform] || 'fas fa-cloud'}" style="margin-right: 4px;"></i> ${s.platform}
                 </span>
             </td>
             <td>${serviceNameHtml}</td>
