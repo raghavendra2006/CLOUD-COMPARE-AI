@@ -16,6 +16,7 @@ pipeline {
     tools {
         maven 'cseMaven' // Ensure Maven is configured as 'cseMaven' in Global Tool Configuration
         jdk 'javacse'    // Ensure JDK 17 or 21 is configured as 'javacse'
+        nodejs 'NodeJS'  // Ensure NodeJS is configured in Global Tool Configuration
     }
 
     stages {
@@ -26,10 +27,21 @@ pipeline {
             }
         }
 
+        stage('Build Frontend') {
+            steps {
+                echo 'Building React + Tailwind frontend...'
+                dir('cloudcompare-frontend') {
+                    bat 'npm ci'
+                    bat 'npm run build'
+                }
+                // Copy React build output into Spring Boot static resources (bundled into JAR)
+                bat 'xcopy /E /I /Y cloudcompare-frontend\\dist src\\main\\resources\\static\\react'
+            }
+        }
+
         stage('Build Jar') {
             steps {
-                echo 'Building Spring Boot application...'
-                // Using wrapper mvnw.cmd for better compatibility
+                echo 'Building Spring Boot application (with React frontend bundled)...'
                 bat 'mvnw.cmd clean package'
             }
         }

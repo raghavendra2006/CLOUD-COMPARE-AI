@@ -123,6 +123,65 @@ public class GrokClientService {
         return mockDataService.getMockAiToolsForPurpose(purpose);
     }
 
+    // ─── NLP Natural Language Query Support ─────────────────────────
+
+    /**
+     * Classifies a free-text query into an intent category using the Groq LLM.
+     */
+    public String classifyQueryIntent(String query) throws IOException, InterruptedException {
+        String apiKey = getNextApiKey();
+        if (PLACEHOLDER_API_KEY.equals(apiKey) || apiKey.isEmpty()) {
+            return "research"; // default fallback when no API key
+        }
+
+        String prompt = "Classify this user query into exactly ONE category: " +
+                "coding, writing, data, image, video, presentation, music, research. " +
+                "Query: \"" + query + "\". " +
+                "Respond with ONLY the category name, nothing else.";
+
+        return callGroqApi(prompt, apiKey).trim().toLowerCase();
+    }
+
+    /**
+     * Sends the full natural language query directly to Groq for rich AI tool comparison.
+     * Protected by Resilience4J Retry and CircuitBreaker.
+     */
+    @Retry(name = "groqApi", fallbackMethod = "fetchNlpFallback")
+    @CircuitBreaker(name = "groqApi", fallbackMethod = "fetchNlpFallback")
+    public List<AiToolResult> fetchNlpComparisonFromGrok(String query) throws IOException, InterruptedException {
+        String apiKey = getNextApiKey();
+        if (PLACEHOLDER_API_KEY.equals(apiKey) || apiKey.isEmpty()) {
+            log.info("Using purpose-aware mock data for NLP query. Query: {}", query);
+            return mockDataService.getMockAiToolsForPurpose(query);
+        }
+
+        String prompt = "Based on this user request: \"" + query + "\"\n\n" +
+                "Recommend the top 5 most relevant AI tools or cloud services.\n" +
+                "Return a JSON array with EXACTLY 5 objects:\n" +
+                "{\n" +
+                "  \"tool_name\": \"<name>\",\n" +
+                "  \"provider\": \"<company>\",\n" +
+                "  \"model_number\": \"<model>\",\n" +
+                "  \"score\": <1-10>,\n" +
+                "  \"pricing\": \"<text>\",\n" +
+                "  \"description\": \"<text>\"\n" +
+                "}\n\n" +
+                "Output ONLY raw JSON.";
+
+        String rawResponse = callGroqApi(prompt, apiKey);
+        String cleaned = extractJson(rawResponse);
+        return objectMapper.readValue(cleaned, new TypeReference<>() {});
+    }
+
+    /**
+     * Fallback for NLP comparison when Circuit Breaker is OPEN or Retries exhausted.
+     */
+    @SuppressWarnings("unused")
+    public List<AiToolResult> fetchNlpFallback(String query, Throwable t) {
+        log.warn("Groq API Circuit Breaker tripped for NLP query. Falling back to mock data. Reason: {}", t.getMessage(), t);
+        return mockDataService.getMockAiToolsForPurpose(query);
+    }
+
     private String callGroqApi(String prompt, String apiKey) throws IOException, InterruptedException {
         String requestBody = objectMapper.writeValueAsString(Map.of(
                 "model", model,

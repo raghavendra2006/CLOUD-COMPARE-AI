@@ -1,6 +1,7 @@
 package com.cloudcompare.ai.controller;
 
 import com.cloudcompare.ai.dto.AiCompareRequest;
+import com.cloudcompare.ai.dto.NlpQueryRequest;
 import com.cloudcompare.ai.dto.AiToolResult;
 import com.cloudcompare.ai.dto.ApiResponse;
 import com.cloudcompare.ai.dto.CompareRequest;
@@ -146,6 +147,46 @@ public class ApiController {
             log.error("AI Tool Analysis interrupted: {}", err.getMessage());
             Thread.currentThread().interrupt();
             return ResponseEntity.status(502).body(ApiResponse.error("AI Analysis interrupted"));
+        }
+    }
+
+    @PostMapping("/nlp-compare")
+    public ResponseEntity<Object> nlpCompare(@Valid @RequestBody NlpQueryRequest req) {
+        String query = req.getQuery();
+        log.info("NLP Query received: {}", query);
+
+        try {
+            // Step 1: Classify the intent
+            String classifiedPurpose = grokClientService.classifyQueryIntent(query);
+
+            // Step 2: Get AI tool recommendations based on the full query
+            String cacheKey = "nlp_" + query.toLowerCase().replaceAll("\\s+", "_");
+            @SuppressWarnings("unchecked")
+            List<AiToolResult> grokResults = (List<AiToolResult>) cacheService.get(cacheKey);
+
+            if (grokResults == null) {
+                grokResults = grokClientService.fetchNlpComparisonFromGrok(query);
+                grokResults.sort((a, b) -> Double.compare(b.getScore(), a.getScore()));
+                for (int i = 0; i < grokResults.size(); i++) {
+                    grokResults.get(i).setRank(i + 1);
+                }
+                cacheService.set(cacheKey, grokResults);
+            }
+
+            return ResponseEntity.ok(ApiResponse.success(Map.of(
+                "originalQuery", query,
+                "classifiedIntent", classifiedPurpose,
+                "totalResults", grokResults.size(),
+                "tools", grokResults
+            )));
+
+        } catch (RuntimeException | IOException err) {
+            log.error("NLP Analysis failed: {}", err.getMessage());
+            return ResponseEntity.status(502).body(ApiResponse.error("NLP Analysis failed: " + err.getMessage()));
+        } catch (InterruptedException err) {
+            log.error("NLP Analysis interrupted: {}", err.getMessage());
+            Thread.currentThread().interrupt();
+            return ResponseEntity.status(502).body(ApiResponse.error("NLP Analysis interrupted"));
         }
     }
 }
