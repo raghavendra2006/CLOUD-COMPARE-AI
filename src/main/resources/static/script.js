@@ -75,6 +75,77 @@ const platformIcons = {
 };
 
 // ============================================================
+// BRANDING: Provider + Service logos (external URLs)
+// NOTE: These are purely for UI rendering (no functional impact).
+// If a mapping is missing, we simply don't render the <img>.
+// ============================================================
+const providerLogoUrlMap = {
+    // Use PNG variants for higher embed compatibility
+    'AWS': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_Web_Services_Logo.svg/512px-Amazon_Web_Services_Logo.svg.png',
+    'GCP': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Google_Cloud_Logo.svg/512px-Google_Cloud_Logo.svg.png',
+    'Azure': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Microsoft_Azure_Logo.svg/512px-Microsoft_Azure_Logo.svg.png',
+    'OCI': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Oracle_Cloud_Logo.svg/512px-Oracle_Cloud_Logo.svg.png',
+    'Alibaba': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Alibaba-Cloud-Logo.svg/512px-Alibaba-Cloud-Logo.svg.png'
+};
+
+function getProviderLogoUrl(provider) {
+    return providerLogoUrlMap?.[provider] || null;
+}
+
+// Service-level logos: map by (platform + known service keyword)
+// We keep it intentionally partial; unknown services won't render a logo.
+const serviceLogoUrlMap = {
+    'AWS': {
+        'EC2': 'https://upload.wikimedia.org/wikipedia/commons/7/7e/Amazon_EC2_Logo.svg',
+        'S3': 'https://upload.wikimedia.org/wikipedia/commons/9/9a/Amazon_S3_Logo.svg',
+        'RDS': 'https://upload.wikimedia.org/wikipedia/commons/a/a8/Amazon_RDS_Logo.svg',
+        'Lambda': 'https://upload.wikimedia.org/wikipedia/commons/9/9f/AWS_Lambda_Logo.svg',
+        'EKS': 'https://upload.wikimedia.org/wikipedia/commons/0/0e/Amazon_EKS_logo.svg',
+        'ECS': 'https://upload.wikimedia.org/wikipedia/commons/2/25/Amazon_ECS_Logo.svg'
+    },
+    'GCP': {
+        'Compute Engine': 'https://upload.wikimedia.org/wikipedia/commons/3/3c/Google_Compute_Engine_logo.svg',
+        'Cloud Run': 'https://upload.wikimedia.org/wikipedia/commons/7/70/Cloud_Run_Logo.svg',
+        'Cloud Storage': 'https://upload.wikimedia.org/wikipedia/commons/0/05/Google_Cloud_Storage_Logo.svg',
+        'BigQuery': 'https://upload.wikimedia.org/wikipedia/commons/5/5c/BigQuery_Logo.svg'
+    },
+    'Azure': {
+        'Virtual Machines': 'https://upload.wikimedia.org/wikipedia/commons/4/4f/Microsoft_Azure_Virtual_Machines_logo.svg',
+        'SQL Database': 'https://upload.wikimedia.org/wikipedia/commons/6/6d/Microsoft_Azure_SQL_Database_logo.svg',
+        'AKS': 'https://upload.wikimedia.org/wikipedia/commons/0/0c/Azure_Kubernetes_Service_logo.svg'
+    },
+    'OCI': {
+        'Compute': 'https://upload.wikimedia.org/wikipedia/commons/9/9a/Oracle_Cloud_Infrastructure_logo.svg',
+        'Object Storage': 'https://upload.wikimedia.org/wikipedia/commons/5/52/Oracle_Object_Storage_logo.svg'
+    },
+    'Alibaba': {
+        'ECS': 'https://upload.wikimedia.org/wikipedia/commons/9/9e/Alibaba_Cloud_ECS_logo.svg',
+        'OSS': 'https://upload.wikimedia.org/wikipedia/commons/0/00/Alibaba_Cloud_OSS_logo.svg'
+    }
+};
+
+function getServiceLogoUrl(platform, serviceName) {
+    const map = serviceLogoUrlMap?.[platform];
+    if (!map || !serviceName) return null;
+
+    const text = serviceName.toLowerCase();
+
+    for (const [keyword, url] of Object.entries(map)) {
+        if (!keyword) continue;
+        if (text.includes(keyword.toLowerCase())) return url;
+    }
+
+    return null;
+}
+
+function renderLogoImg({ url, alt, sizePx = 18 }) {
+    if (!url) return '';
+    return `<img src="${url}" alt="${alt || ''}" loading="lazy" style="width:${sizePx}px;height:${sizePx}px;object-fit:contain;display:inline-block;vertical-align:middle;filter: drop-shadow(0 0 6px rgba(0,0,0,0.25));" onerror="this.style.display='none';">`;
+}
+
+
+
+// ============================================================
 // SERVICE URL MAPPING — Real cloud provider product pages
 // ============================================================
 const serviceUrlMap = {
@@ -642,10 +713,13 @@ function displayRecommendations(services) {
             <div class="recommendation-content">
                 <div class="recommendation-platform">
                     <h3 style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
-                        <span style="color:${platformColors[rec.platform] || '#3b82f6'}; font-size:1.15rem; display:inline-flex; align-items:center; justify-content:center;">
-                            <i class="${platformIcons[rec.platform] || 'fas fa-cloud'}"></i>
+                        <span style="font-size:1.15rem; display:inline-flex; align-items:center; justify-content:center;">
+                            ${renderLogoImg({ url: getProviderLogoUrl(rec.platform), alt: rec.platform, sizePx: 22 })}
                         </span>
-                        <span>${rec.platform} - ${rec.service_name}</span>
+                        <span style="display:inline-flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+                            <span>${rec.platform} -</span>
+                            <span>${rec.service_name}</span>
+                        </span>
                     </h3>
                 </div>
                 <div class="recommendation-stats">
@@ -1353,10 +1427,12 @@ function displayTable(services) {
             <td><span class="rank-badge ${rankClass}">#${s.rank}</span></td>
             <td>
                 <span class="platform-badge" style="background: ${platformColors[s.platform]}">
-                    <i class="${platformIcons[s.platform] || 'fas fa-cloud'}" style="margin-right: 4px;"></i> ${s.platform}
+                    ${renderLogoImg({ url: getProviderLogoUrl(s.platform), alt: s.platform, sizePx: 18 })}
+                    <span style="margin-left:4px;">${s.platform}</span>
                 </span>
             </td>
             <td>${serviceNameHtml}</td>
+
             <td>${s.cpu || '-'}</td>
             <td>${s.ram || '-'}</td>
             <td>${s.storage || '-'}</td>
@@ -1438,9 +1514,10 @@ function displayProviderStats(stats) {
 
         card.innerHTML = `
             <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                <span style="color: ${platformColors[stat.platform] || '#3b82f6'}; font-size: 1.25rem;">
-                    <i class="${platformIcons[stat.platform] || 'fas fa-cloud'}"></i>
+                <span style="font-size: 1.25rem; display:inline-flex; align-items:center; justify-content:center;">
+                    ${renderLogoImg({ url: getProviderLogoUrl(stat.platform), alt: stat.platform, sizePx: 28 })}
                 </span>
+
                 <strong style="font-size: 1.1rem; color: white;">${stat.platform}</strong>
             </div>
             <div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
