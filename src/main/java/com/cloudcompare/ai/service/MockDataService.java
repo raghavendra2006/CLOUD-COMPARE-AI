@@ -56,33 +56,17 @@ public class MockDataService {
 
         String lower = purpose.toLowerCase();
 
-        if (lower.contains("coding") || lower.contains("software") || lower.contains("development")) {
-            return getCodingTools();
-        }
-        if (lower.contains("content") || lower.contains("writing") || lower.contains("copywriting")) {
-            return getWritingTools();
-        }
-        if (lower.contains("data") || lower.contains("analysis") || lower.contains("spreadsheet")) {
-            return getDataTools();
-        }
-        if (lower.contains("image") || lower.contains("design") || lower.contains("graphic")) {
-            return getImageTools();
-        }
-        if (lower.contains("video") || lower.contains("editing")) {
-            return getVideoTools();
-        }
-        if (lower.contains("presentation") || lower.contains("slide")) {
-            return getPresentationTools();
-        }
-        if (lower.contains("music") || lower.contains("audio")) {
-            return getMusicTools();
-        }
-        if (lower.contains("research") || lower.contains("chat") || lower.contains("general")) {
-            return getResearchTools();
-        }
-
-        // Default fallback for unrecognized purposes
-        return getMockAiTools();
+        return switch (lower) {
+            case String s when s.contains("coding") || s.contains("software") || s.contains("development") -> getCodingTools();
+            case String s when s.contains("content") || s.contains("writing") || s.contains("copywriting") -> getWritingTools();
+            case String s when s.contains("data") || s.contains("analysis") || s.contains("spreadsheet") -> getDataTools();
+            case String s when s.contains("image") || s.contains("design") || s.contains("graphic") -> getImageTools();
+            case String s when s.contains("video") || s.contains("editing") -> getVideoTools();
+            case String s when s.contains("presentation") || s.contains("slide") -> getPresentationTools();
+            case String s when s.contains("music") || s.contains("audio") -> getMusicTools();
+            case String s when s.contains("research") || s.contains("chat") || s.contains("general") -> getResearchTools();
+            default -> getMockAiTools();
+        };
     }
 
     public List<AiToolResult> getMockAiTools() {

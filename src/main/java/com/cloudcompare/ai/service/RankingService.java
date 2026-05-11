@@ -167,7 +167,8 @@ public class RankingService {
         double costMin = Arrays.stream(costValues).min().orElse(0);
         double costMax = Arrays.stream(costValues).max().orElse(0);
 
-        List<ServiceResult> processed = processResults(results, category, hours, storage, performanceWeight, popularityWeight, costWeight, costMin, costMax);
+        ProcessingContext ctx = new ProcessingContext(category, hours, storage, performanceWeight, popularityWeight, costWeight, costMin, costMax);
+        List<ServiceResult> processed = processResults(results, ctx);
 
         // Sort by score descending
         processed.sort((a, b) -> Double.compare(b.getScore(), a.getScore()));
@@ -226,11 +227,11 @@ public class RankingService {
     // HELPERS
     // ============================================================
 
-    private List<ServiceResult> processResults(List<ServiceResult> results, String category, int hours, int storage, double pw, double ppw, double cw, double costMin, double costMax) {
+    private List<ServiceResult> processResults(List<ServiceResult> results, ProcessingContext ctx) {
         List<ServiceResult> processed = new ArrayList<>();
         for (int i = 0; i < results.size(); i++) {
             ServiceResult s = results.get(i);
-            CostDetails cd = calculateCosts(s, category, hours, storage);
+            CostDetails cd = calculateCosts(s, ctx.category(), ctx.hours(), ctx.storage());
             double costVal = cd.costVal;
             double costPerHour = cd.costPerHour;
 
@@ -242,13 +243,13 @@ public class RankingService {
             double popularityNorm = s.getPopularityScore() > 0 ? s.getPopularityScore() : 5;
 
             double costScore = 5;
-            if (costMax > costMin && costVal > 0) {
-                costScore = 10 * (1 - (costVal - costMin) / (costMax - costMin));
-            } else if (costVal == costMin && costVal > 0) {
+            if (ctx.costMax() > ctx.costMin() && costVal > 0) {
+                costScore = 10 * (1 - (costVal - ctx.costMin()) / (ctx.costMax() - ctx.costMin()));
+            } else if (costVal == ctx.costMin() && costVal > 0) {
                 costScore = 10;
             }
 
-            double score = (performanceNorm * pw) + (popularityNorm * ppw) + (costScore * cw);
+            double score = (performanceNorm * ctx.pw()) + (popularityNorm * ctx.ppw()) + (costScore * ctx.cw());
 
             ServiceResult p = new ServiceResult();
             p.setId(s.getId());
@@ -322,6 +323,8 @@ public class RankingService {
         }
         return new CostDetails(costVal, costPerHour);
     }
+
+    private record ProcessingContext(String category, int hours, int storage, double pw, double ppw, double cw, double costMin, double costMax) {}
 
     private static class Weights {
         double performance;
