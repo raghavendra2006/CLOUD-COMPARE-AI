@@ -25,10 +25,30 @@ The fastest way to run CloudCompare AI locally is via Docker Compose:
 git clone https://github.com/raghavendra2006/CLOUD-COMPARE-AI.git
 cd CLOUD-COMPARE-AI
 
-# 2. Start the application
+# 2. Configure .env (see Environment Variables section)
+
+# 3. Start the application
 docker-compose up -d --build
 ```
 *The platform will be available at `http://localhost:5000`*
+
+---
+
+# 🌐 Production Deployment (AWS EC2)
+
+This project is configured for automated deployment to AWS EC2 via Jenkins.
+
+### 1. Server Setup
+- **OS**: Ubuntu 22.04 LTS
+- **Runtime**: Docker & Docker Compose
+- **Security Group**: Allow TCP `5000` (App) and `22` (SSH)
+
+### 2. Jenkins Integration
+The `Jenkinsfile` automates the entire lifecycle:
+- **Build**: Compiles Java 21 Spring Boot artifacts.
+- **Analyze**: Executes SonarQube Quality Gate checks.
+- **Docker**: Pushes images to Docker Hub.
+- **Deploy**: Connects via SSH to EC2 and restarts the container using `docker-compose`.
 
 ---
 
@@ -80,14 +100,14 @@ graph TD
 
 | Layer | Technologies |
 |---|---|
-| Backend | Java 21 (Virtual Threads), Spring Boot 3 |
-| Security | Spring Security, JWT |
-| Database | MySQL, H2 |
-| ORM | Spring Data JPA, Hibernate |
-| AI Integration | Groq API, Llama 3.1 |
-| Frontend | HTML, CSS, JavaScript, Chart.js |
-| DevOps | Docker, Jenkins, SonarQube |
-| Testing | JUnit 5, Mockito, JaCoCo |
+| Backend | Java 21 (Switch Expressions, Records, Virtual Threads) |
+| Security | Spring Security, JWT, Rate Limiting |
+| Database | MySQL (Production), H2 (Test) |
+| ORM | Spring Data JPA, Hibernate 6 |
+| AI Integration | Groq API (Llama 3.1 70B) |
+| Branding | Enterprise Local Assets (Oracle OCI, AWS, GCP, Azure) |
+| DevOps | Jenkins (Declarative Pipeline), Docker, SonarQube |
+| Testing | JUnit 5, Mockito, JaCoCo (87%+ Coverage) |
 
 ---
 
@@ -238,12 +258,23 @@ POST /api/compare
 Create a `.env` file:
 
 ```env
-GROQ_API_KEY=your_groq_api_key
+# AI Configuration
+GROK_API_KEYS=your_groq_api_key
+
+# Security
 JWT_SECRET=your_jwt_secret
-DB_URL=jdbc:mysql://localhost:3306/cloudcompare_ai
-DB_USERNAME=root
+
+# Database (Production)
+DB_HOST=your_db_host
+DB_NAME=cloudcompare
+DB_USER=root
 DB_PASSWORD=your_password
 ```
+
+### Jenkins Credentials Required
+- `ec2-pem-key`: SSH Private Key for EC2 access.
+- `dockerhubcred`: Username/Password for Docker Hub registry.
+- `GROK_API_KEY_SECRET`: Secret Text for AI Engine connectivity.
 
 ---
 
