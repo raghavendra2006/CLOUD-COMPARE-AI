@@ -1,0 +1,13 @@
+# Terraform state
+*.tfstate
+*.tfstate.*
+.terraform/
+crash.log
+crash.*
+*.retry
+# Local overrides
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+

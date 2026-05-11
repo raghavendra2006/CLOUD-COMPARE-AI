@@ -1,17 +1,20 @@
 package com.cloudcompare.ai.controller;
 
 import com.cloudcompare.ai.dto.AiCompareRequest;
-import com.cloudcompare.ai.dto.NlpQueryRequest;
 import com.cloudcompare.ai.dto.AiToolResult;
 import com.cloudcompare.ai.dto.ApiResponse;
 import com.cloudcompare.ai.dto.CompareRequest;
 import com.cloudcompare.ai.dto.CompareResponse;
 import com.cloudcompare.ai.dto.Region;
 import com.cloudcompare.ai.dto.ServiceType;
+import com.cloudcompare.ai.dto.ChatRequest;
+import com.cloudcompare.ai.dto.ChatResponse;
 import com.cloudcompare.ai.service.CacheService;
 import com.cloudcompare.ai.service.GrokClientService;
 import com.cloudcompare.ai.service.MetaDataService;
 import com.cloudcompare.ai.service.RankingService;
+import com.cloudcompare.ai.service.chat.AiToolsChatbotService;
+import com.cloudcompare.ai.service.chat.CloudCompareChatbotService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +33,7 @@ import java.util.Map;
 
 /**
  * REST Controller — direct port of server.js + routes.js
- * All endpoints, response shapes, and behavior match the original exactly.
+ * Additive endpoints: cloud+AI chatbots + NLP override.
  */
 @RestController
 @RequestMapping("/api")
@@ -44,14 +47,21 @@ public class ApiController {
     private final CacheService cacheService;
     private final RankingService rankingService;
 
+    private final CloudCompareChatbotService cloudCompareChatbotService;
+    private final AiToolsChatbotService aiToolsChatbotService;
+
     public ApiController(GrokClientService grokClientService,
                          MetaDataService metaDataService,
                          CacheService cacheService,
-                         RankingService rankingService) {
+                         RankingService rankingService,
+                         CloudCompareChatbotService cloudCompareChatbotService,
+                         AiToolsChatbotService aiToolsChatbotService) {
         this.grokClientService = grokClientService;
         this.metaDataService = metaDataService;
         this.cacheService = cacheService;
         this.rankingService = rankingService;
+        this.cloudCompareChatbotService = cloudCompareChatbotService;
+        this.aiToolsChatbotService = aiToolsChatbotService;
     }
 
     @GetMapping("/test")
@@ -72,7 +82,6 @@ public class ApiController {
         log.info("Processing comparison for {} -> {}", category, svcType);
 
         try {
-            // PURE AI MODE: Always fetch from Groq API as requested
             String cacheKey = "compare_" + category + "_" + svcType;
             @SuppressWarnings("unchecked")
             List<Map<String, Object>> grokResults = (List<Map<String, Object>>) cacheService.get(cacheKey);
@@ -118,6 +127,9 @@ public class ApiController {
     @PostMapping("/ai-compare")
     public ResponseEntity<Object> compareAiTools(@Valid @RequestBody AiCompareRequest req) {
         String purpose = req.getPurpose();
+        if (req.getQueryText() != null && !req.getQueryText().trim().isEmpty()) {
+            purpose = req.getQueryText().trim();
+        }
         log.info("AI Analysis request for: {}", purpose);
 
         try {
@@ -135,9 +147,9 @@ public class ApiController {
             }
 
             return ResponseEntity.ok(ApiResponse.success(Map.of(
-                "purpose", purpose,
-                "totalResults", grokResults.size(),
-                "tools", grokResults
+                    "purpose", purpose,
+                    "totalResults", grokResults.size(),
+                    "tools", grokResults
             )));
 
         } catch (RuntimeException | IOException err) {
@@ -150,43 +162,15 @@ public class ApiController {
         }
     }
 
-    @PostMapping("/nlp-compare")
-    public ResponseEntity<Object> nlpCompare(@Valid @RequestBody NlpQueryRequest req) {
-        String query = req.getQuery();
-        log.info("NLP Query received: {}", query);
+    @PostMapping("/chat/cloud")
+    public ResponseEntity<Object> chatCloud(@Valid @RequestBody ChatRequest req) {
+        ChatResponse reply = cloudCompareChatbotService.chat(req);
+        return ResponseEntity.ok(ApiResponse.success(Map.of("reply", reply.getReply())));
+    }
 
-        try {
-            // Step 1: Classify the intent
-            String classifiedPurpose = grokClientService.classifyQueryIntent(query);
-
-            // Step 2: Get AI tool recommendations based on the full query
-            String cacheKey = "nlp_" + query.toLowerCase().replaceAll("\\s+", "_");
-            @SuppressWarnings("unchecked")
-            List<AiToolResult> grokResults = (List<AiToolResult>) cacheService.get(cacheKey);
-
-            if (grokResults == null) {
-                grokResults = grokClientService.fetchNlpComparisonFromGrok(query);
-                grokResults.sort((a, b) -> Double.compare(b.getScore(), a.getScore()));
-                for (int i = 0; i < grokResults.size(); i++) {
-                    grokResults.get(i).setRank(i + 1);
-                }
-                cacheService.set(cacheKey, grokResults);
-            }
-
-            return ResponseEntity.ok(ApiResponse.success(Map.of(
-                "originalQuery", query,
-                "classifiedIntent", classifiedPurpose,
-                "totalResults", grokResults.size(),
-                "tools", grokResults
-            )));
-
-        } catch (RuntimeException | IOException err) {
-            log.error("NLP Analysis failed: {}", err.getMessage());
-            return ResponseEntity.status(502).body(ApiResponse.error("NLP Analysis failed: " + err.getMessage()));
-        } catch (InterruptedException err) {
-            log.error("NLP Analysis interrupted: {}", err.getMessage());
-            Thread.currentThread().interrupt();
-            return ResponseEntity.status(502).body(ApiResponse.error("NLP Analysis interrupted"));
-        }
+    @PostMapping("/chat/ai-tools")
+    public ResponseEntity<Object> chatAiTools(@Valid @RequestBody ChatRequest req) {
+        ChatResponse reply = aiToolsChatbotService.chat(req);
+        return ResponseEntity.ok(ApiResponse.success(Map.of("reply", reply.getReply())));
     }
 }

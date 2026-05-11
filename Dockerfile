@@ -2,7 +2,7 @@
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
-# Copy the pre-built jar (frontend is already bundled inside by Jenkins)
+# Copy the pre-built jar
 COPY target/*.jar app.jar
 
 EXPOSE 5000

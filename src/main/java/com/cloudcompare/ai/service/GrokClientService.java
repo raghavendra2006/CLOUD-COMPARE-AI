@@ -15,17 +15,17 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.List;
-import java.util.Collections;
-import java.util.Map;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import com.cloudcompare.ai.dto.AiToolResult;
 import com.cloudcompare.ai.exception.BusinessException;
 
 /**
- * 🚀 OVER-EXCELLENCE: Groq API client with Resilience4J Circuit Breakers and Retries.
- * Executes on Java 21 Virtual Threads natively, scaling to thousands of concurrent requests.
+ * Groq API client with Resilience4J Circuit Breakers and Retries.
  */
 @Service
 public class GrokClientService {
@@ -36,13 +36,14 @@ public class GrokClientService {
     @Value("${grok.api.keys}")
     private String apiKeysRaw;
 
-    private List<String> getApiKeys() {
-        if (apiKeysRaw == null || apiKeysRaw.isEmpty()) return Collections.emptyList();
-        return Arrays.stream(apiKeysRaw.split(","))
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .toList();
-    }
+    private final MockDataService mockDataService;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final HttpClient httpClient = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(10))
+            .build();
+
+    private final AtomicInteger keyIndex = new AtomicInteger(0);
 
     @Value("${grok.endpoint}")
     private String endpoint;
@@ -53,16 +54,16 @@ public class GrokClientService {
     @Value("${grok.timeout:15000}")
     private int timeoutMs;
 
-    private final MockDataService mockDataService;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private final HttpClient httpClient = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(10))
-            .build();
-    private final AtomicInteger keyIndex = new AtomicInteger(0);
-
     public GrokClientService(MockDataService mockDataService) {
         this.mockDataService = mockDataService;
+    }
+
+    private List<String> getApiKeys() {
+        if (apiKeysRaw == null || apiKeysRaw.isEmpty()) return Collections.emptyList();
+        return Arrays.stream(apiKeysRaw.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
     }
 
     private String getNextApiKey() {
@@ -71,13 +72,10 @@ public class GrokClientService {
         return keys.get(Math.abs(keyIndex.getAndIncrement() % keys.size()));
     }
 
-    /**
-     * Protected by Resilience4J Retry and CircuitBreaker.
-     * If the API fails repeatedly, it trips the circuit and calls the fallback method gracefully.
-     */
     @Retry(name = "groqApi", fallbackMethod = "fetchComparisonFallback")
     @CircuitBreaker(name = "groqApi", fallbackMethod = "fetchComparisonFallback")
-    public List<Map<String, Object>> fetchComparisonFromGrok(String category, String serviceType) throws IOException, InterruptedException {
+    public List<Map<String, Object>> fetchComparisonFromGrok(String category, String serviceType)
+            throws IOException, InterruptedException {
         String apiKey = getNextApiKey();
         if (PLACEHOLDER_API_KEY.equals(apiKey) || apiKey.isEmpty()) {
             log.info("Using mock Groq response because API key is placeholder.");
@@ -90,9 +88,6 @@ public class GrokClientService {
         return objectMapper.readValue(cleaned, new TypeReference<>() {});
     }
 
-    /**
-     * Fallback method when Circuit Breaker is OPEN or Retries are exhausted.
-     */
     @SuppressWarnings("unused")
     public List<Map<String, Object>> fetchComparisonFallback(String category, String serviceType, Throwable t) {
         log.warn("Groq API Circuit Breaker tripped / Retries exhausted. Falling back to static cache. Reason: {}", t.getMessage(), t);
@@ -101,7 +96,8 @@ public class GrokClientService {
 
     @Retry(name = "groqApi", fallbackMethod = "fetchAiToolsFallback")
     @CircuitBreaker(name = "groqApi", fallbackMethod = "fetchAiToolsFallback")
-    public List<AiToolResult> fetchAiToolsComparisonFromGrok(String purpose) throws IOException, InterruptedException {
+    public List<AiToolResult> fetchAiToolsComparisonFromGrok(String purpose)
+            throws IOException, InterruptedException {
         String apiKey = getNextApiKey();
         if (PLACEHOLDER_API_KEY.equals(apiKey) || apiKey.isEmpty()) {
             log.info("Using purpose-aware mock data for AI tools. Purpose: {}", purpose);
@@ -114,24 +110,18 @@ public class GrokClientService {
         return objectMapper.readValue(cleaned, new TypeReference<>() {});
     }
 
-    /**
-     * Fallback method when Circuit Breaker is OPEN or Retries are exhausted.
-     */
     @SuppressWarnings("unused")
     public List<AiToolResult> fetchAiToolsFallback(String purpose, Throwable t) {
         log.warn("Groq API Circuit Breaker tripped for AI Tools. Falling back to purpose-aware mock data. Reason: {}", t.getMessage(), t);
         return mockDataService.getMockAiToolsForPurpose(purpose);
     }
 
-    // ─── NLP Natural Language Query Support ─────────────────────────
+    // NLP Natural Language Query Support (additive)
 
-    /**
-     * Classifies a free-text query into an intent category using the Groq LLM.
-     */
     public String classifyQueryIntent(String query) throws IOException, InterruptedException {
         String apiKey = getNextApiKey();
         if (PLACEHOLDER_API_KEY.equals(apiKey) || apiKey.isEmpty()) {
-            return "research"; // default fallback when no API key
+            return "research";
         }
 
         String prompt = "Classify this user query into exactly ONE category: " +
@@ -142,10 +132,6 @@ public class GrokClientService {
         return callGroqApi(prompt, apiKey).trim().toLowerCase();
     }
 
-    /**
-     * Sends the full natural language query directly to Groq for rich AI tool comparison.
-     * Protected by Resilience4J Retry and CircuitBreaker.
-     */
     @Retry(name = "groqApi", fallbackMethod = "fetchNlpFallback")
     @CircuitBreaker(name = "groqApi", fallbackMethod = "fetchNlpFallback")
     public List<AiToolResult> fetchNlpComparisonFromGrok(String query) throws IOException, InterruptedException {
@@ -173,9 +159,6 @@ public class GrokClientService {
         return objectMapper.readValue(cleaned, new TypeReference<>() {});
     }
 
-    /**
-     * Fallback for NLP comparison when Circuit Breaker is OPEN or Retries exhausted.
-     */
     @SuppressWarnings("unused")
     public List<AiToolResult> fetchNlpFallback(String query, Throwable t) {
         log.warn("Groq API Circuit Breaker tripped for NLP query. Falling back to mock data. Reason: {}", t.getMessage(), t);
@@ -214,25 +197,25 @@ public class GrokClientService {
 
     private String extractJson(String raw) {
         if (raw == null || raw.isEmpty()) return "[]";
-        
+
         int startBracket = raw.indexOf('[');
         int startBrace = raw.indexOf('{');
         int start = -1;
-        
+
         if (startBracket != -1 && (startBrace == -1 || startBracket < startBrace)) {
             start = startBracket;
         } else if (startBrace != -1) {
             start = startBrace;
         }
-        
+
         if (start == -1) return raw;
 
         int endBracket = raw.lastIndexOf(']');
         int endBrace = raw.lastIndexOf('}');
         int end = Math.max(endBracket, endBrace);
-        
+
         if (end == -1 || end <= start) return raw;
-        
+
         return raw.substring(start, end + 1);
     }
 
