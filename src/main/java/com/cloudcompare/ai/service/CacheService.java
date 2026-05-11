@@ -32,8 +32,6 @@ public class CacheService {
         cache.put(key, value);
     }
 
-
-
     public void clear() {
         cache.invalidateAll();
     }

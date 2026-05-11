@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 import com.cloudcompare.ai.dto.AiToolResult;
 import com.cloudcompare.ai.exception.BusinessException;
 

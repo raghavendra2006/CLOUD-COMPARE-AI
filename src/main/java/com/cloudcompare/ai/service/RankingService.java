@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Ranking and response builder — exact port of rankAndRespond() from routes.js
@@ -168,12 +167,7 @@ public class RankingService {
         double costMin = Arrays.stream(costValues).min().orElse(0);
         double costMax = Arrays.stream(costValues).max().orElse(0);
 
-        List<ServiceResult> processed = new ArrayList<>();
-        double pw = performanceWeight;
-        double ppw = popularityWeight;
-        double cw = costWeight;
-
-        processed = processResults(results, category, hours, storage, pw, ppw, cw, costMin, costMax);
+        List<ServiceResult> processed = processResults(results, category, hours, storage, performanceWeight, popularityWeight, costWeight, costMin, costMax);
 
         // Sort by score descending
         processed.sort((a, b) -> Double.compare(b.getScore(), a.getScore()));
