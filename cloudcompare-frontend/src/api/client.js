@@ -17,10 +17,9 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// ─── Auth ──────────────────────────────────────────
 export const authApi = {
   login: (email, password) => api.post('/auth/login', { email, password }),
-  signup: (username, email, password) => api.post('/auth/signup', { username, email, password })
+  signup: (name, email, password) => api.post('/auth/signup', { name, email, password })
 }
 
 // ─── Cloud Compare ─────────────────────────────────
