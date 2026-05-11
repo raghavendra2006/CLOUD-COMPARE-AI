@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  mysql-local:
+    image: mysql:8.0
+    container_name: cloudcompare-mysql-local
+    environment:
+      MYSQL_ROOT_PASSWORD: Ap27@7054
+      MYSQL_DATABASE: cloudcompare
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_local_data:/var/lib/mysql
+    restart: unless-stopped
+
+volumes:
+  mysql_local_data:
