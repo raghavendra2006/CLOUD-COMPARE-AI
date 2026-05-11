@@ -3,440 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CloudCompare AI — Smart Cloud & AI Discovery Platform</title>
-    <meta name="description" content="Compare and analyze leading AI tools, cloud platforms, and modern software solutions in one intelligent platform.">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>CloudCompare AI - Smart Cloud & AI Discovery</title>
+    <meta name="description" content="Discover and compare leading AI tools, cloud platforms, and modern software solutions in one intelligent platform.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #00d2ff;
+            --secondary: #8a2be2;
+            --bg-dark: #030014;
+            --text-light: #ffffff;
+            --text-gray: #94a3b8;
+            --gradient-btn: linear-gradient(135deg, #00d2ff, #8a2be2);
+            --gradient-text: linear-gradient(135deg, #00d2ff, #8a2be2);
+        }
+
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: var(--text-light); min-height: 100vh; overflow-x: hidden; position: relative; }
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #060b1e;
-            color: #e2e8f0;
-            min-height: 100vh;
-            overflow-x: hidden;
-            transition: background 0.5s ease, color 0.5s ease;
+        /* Dynamic Space Background */
+        body::before {
+            content: ''; position: fixed; inset: 0; z-index: -2;
+            background: 
+                radial-gradient(ellipse at 80% 50%, rgba(138, 43, 226, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 20% 80%, rgba(0, 210, 255, 0.1) 0%, transparent 40%);
+        }
+        /* Stars effect */
+        .stars { position: fixed; inset: 0; z-index: -1; background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 50px 50px; opacity: 0.1; }
+
+        /* Navbar */
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 4rem; position: relative; z-index: 10; }
+        .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: white; font-weight: 700; font-size: 1.2rem; }
+        .logo-icon { width: 32px; height: 32px; background: var(--gradient-btn); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        
+        .nav-actions { display: flex; gap: 1rem; align-items: center; }
+        .btn { padding: 0.7rem 1.8rem; border-radius: 9999px; font-weight: 500; font-size: 0.9rem; cursor: pointer; transition: all 0.3s; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-outline { background: transparent; color: white; border: 1px solid rgba(255,255,255,0.2); }
+        .btn-outline:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.4); }
+        .btn-primary { background: var(--gradient-btn); color: white; border: none; }
+        .btn-primary:hover { box-shadow: 0 0 20px rgba(138, 43, 226, 0.4); transform: translateY(-1px); }
+
+        /* Hero Section */
+        .hero { display: flex; justify-content: space-between; padding: 4rem 4rem; position: relative; min-height: calc(100vh - 200px); }
+        
+        /* Left Column - Content */
+        .hero-content { flex: 1; max-width: 600px; z-index: 10; display: flex; flex-direction: column; justify-content: center; }
+        .subtitle { color: var(--secondary); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1.5rem; }
+        .title { font-size: 4.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem; letter-spacing: -0.02em; }
+        .title span { background: var(--gradient-text); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .description { color: var(--text-gray); font-size: 1.1rem; line-height: 1.6; margin-bottom: 2.5rem; max-width: 500px; }
+        .hero-actions { display: flex; gap: 1rem; }
+        .btn-hero-outline { background: rgba(10, 10, 25, 0.6); border: 1px solid rgba(138, 43, 226, 0.4); color: white; }
+        .btn-hero-outline:hover { background: rgba(138, 43, 226, 0.1); border-color: var(--secondary); }
+
+        /* Right Column - Orbital Graphics */
+        .hero-graphics { flex: 1; position: relative; display: flex; justify-content: center; align-items: center; }
+        
+        /* Glowing Orbital Ring */
+        .orbital-ring {
+            position: absolute; width: 800px; height: 800px; border-radius: 50%;
+            border: 2px solid rgba(0, 210, 255, 0.2);
+            box-shadow: inset 0 0 50px rgba(138, 43, 226, 0.2), 0 0 100px rgba(0, 210, 255, 0.15);
+            right: -200px; top: 50%; transform: translateY(-50%);
+            border-top-color: rgba(138, 43, 226, 0.6);
+            border-right-color: rgba(0, 210, 255, 0.6);
+            z-index: 1;
         }
 
-        /* ── NAV ── */
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.25rem 3rem;
-            position: relative;
-            z-index: 20;
+        /* Top Right Badge */
+        .top-badge {
+            position: absolute; top: -20px; right: 0;
+            background: rgba(10, 10, 25, 0.6); border: 1px solid rgba(138, 43, 226, 0.3);
+            padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.8rem;
+            display: flex; align-items: center; gap: 6px; backdrop-filter: blur(10px); z-index: 10;
         }
-        .nav-logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 700;
-            font-size: 1.3rem;
-            color: #fff;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        .nav-logo i {
-            font-size: 1.5rem;
-            background: linear-gradient(135deg, #00d4aa, #7c3aed);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .nav-actions { display: flex; gap: 0.75rem; align-items: center; }
-        .btn-nav {
-            padding: 0.6rem 1.5rem;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-        .btn-login-nav {
-            background: transparent;
-            color: #e2e8f0;
-            border: 1px solid rgba(255,255,255,0.15);
-        }
-        .btn-login-nav:hover { border-color: #00d4aa; color: #00d4aa; }
-        .btn-signup-nav {
-            background: linear-gradient(135deg, #00d4aa, #00b894);
-            color: #060b1e;
-            border: none;
-        }
-        .btn-signup-nav:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,212,170,0.3); }
+        .top-badge i { color: #a5f3fc; font-size: 0.7rem; }
 
-        /* Theme Toggle */
-        .theme-toggle-landing {
-            width: 42px; height: 42px;
-            border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.12);
-            background: rgba(255,255,255,0.06);
-            color: #fbbf24;
-            font-size: 1.1rem;
-            cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .theme-toggle-landing:hover {
-            background: rgba(0,212,170,0.12);
-            border-color: #00d4aa;
-            transform: translateY(-2px) rotate(15deg);
-            box-shadow: 0 4px 20px rgba(0,212,170,0.2);
-        }
-        .theme-toggle-landing i { transition: transform 0.4s ease; }
-        .theme-toggle-landing:active i { transform: rotate(180deg); }
+        /* Floating Logos */
+        .floating-logo {
+            position: absolute; background: rgba(15, 17, 33, 0.8);
+            border: 1px solid rgba(138, 43, 226, 0.2); backdrop-filter: blur(12px);
+            border-radius: 16px; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 5;
+            transition: transform 0.3s ease; animation: float 6s ease-in-out infinite;
+        }        .floating-logo:hover { transform: scale(1.1) translateY(-5px); border-color: var(--primary); z-index: 20; }
+        .floating-logo img { max-width: 100%; max-height: 100%; object-fit: contain; padding: 10px; filter: drop-shadow(0 0 8px rgba(255,255,255,0.1)); }
+        
+        .logo-aws { width: 90px; height: 60px; top: 10%; left: 10%; animation-delay: 0s; }
+        .logo-aws img { filter: drop-shadow(0 0 10px rgba(255, 153, 0, 0.4)); padding: 12px; }
+        .logo-azure { width: 80px; height: 80px; top: 20%; right: 10%; animation-delay: 1s; }
+        .logo-azure img { padding: 16px; }
+        .logo-gcp { width: 90px; height: 90px; top: 35%; left: 35%; animation-delay: 2s; border-color: rgba(0, 210, 255, 0.4); box-shadow: 0 0 30px rgba(0, 210, 255, 0.2); }
+        .logo-gcp img { padding: 18px; }
+        .logo-oci { width: 85px; height: 60px; bottom: 35%; right: -5%; animation-delay: 3s; }
+        .logo-alibaba { width: 100px; height: 60px; top: 50%; right: 25%; animation-delay: 1.5s; }
+        .logo-alibaba img { filter: invert(1) brightness(2); }
+        .logo-anthropic { width: 80px; height: 80px; bottom: 25%; left: 0; animation-delay: 3s; flex-direction: column; gap: 4px; }
+        .logo-anthropic span { font-size: 1.4rem; font-weight: 800; color: white; }
+        .logo-anthropic small { font-size: 0.45rem; letter-spacing: 1px; color: #a1a1aa; }
+        .logo-gemini { width: 80px; height: 40px; bottom: 15%; left: 30%; animation-delay: 1.5s; font-size: 1rem; font-weight: 600; color: #4facfe; }
+        .logo-groq { width: 80px; height: 60px; bottom: 20%; right: 25%; animation-delay: 2.5s; font-size: 1.2rem; font-weight: bold; color: #f97316; }
 
-        /* ── HERO ── */
-        .hero {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            align-items: center;
-            min-height: calc(100vh - 180px);
-            padding: 0 3rem;
-            position: relative;
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
         }
-        .hero-left { z-index: 10; }
-        .hero-tag {
-            display: inline-block;
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: #00d4aa;
-            margin-bottom: 1.5rem;
-        }
-        .hero-title {
-            font-size: clamp(2.5rem, 5vw, 4.5rem);
-            font-weight: 900;
-            line-height: 1.1;
-            margin-bottom: 1.5rem;
-            transition: color 0.3s;
-        }
-        .hero-title .gradient-text {
-            background: linear-gradient(135deg, #7c3aed, #00d4aa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .hero-description {
-            font-size: 1.1rem;
-            color: #94a3b8;
-            max-width: 480px;
-            line-height: 1.7;
-            margin-bottom: 2rem;
-            transition: color 0.3s;
-        }
-        .hero-btns { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
-        .btn-primary {
-            padding: 0.9rem 2rem;
-            background: linear-gradient(135deg, #00d4aa, #00b894);
-            color: #060b1e;
-            border: none;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,212,170,0.35); }
-        .btn-outline {
-            padding: 0.9rem 2rem;
-            background: transparent;
-            color: #e2e8f0;
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.3s;
-        }
-        .btn-outline:hover { border-color: #7c3aed; color: #c4b5fd; }
 
-        /* ── FLOATING CARDS ── */
-        .hero-right {
-            position: relative;
-            height: 500px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .orb {
-            position: absolute;
-            width: 420px; height: 420px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(124,58,237,0.25) 0%, rgba(124,58,237,0.05) 50%, transparent 70%);
-            border: 1px solid rgba(124,58,237,0.15);
-            animation: orbPulse 6s ease-in-out infinite;
-            transition: opacity 0.5s;
-        }
-        @keyframes orbPulse {
-            0%, 100% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.05); opacity: 1; }
-        }
-        .badge-text {
-            position: absolute;
-            top: -20px; right: -10px;
-            background: rgba(15,23,42,0.8);
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            color: #fbbf24;
-            display: flex; align-items: center; gap: 6px;
-            backdrop-filter: blur(10px);
-            white-space: nowrap;
-            z-index: 15;
-            transition: background 0.3s, border-color 0.3s, color 0.3s;
-        }
-        .cloud-card {
-            position: absolute;
-            background: rgba(15,23,42,0.7);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 14px;
-            padding: 12px 18px;
-            display: flex; align-items: center; gap: 10px;
-            font-weight: 600; font-size: 0.85rem; color: #e2e8f0;
-            backdrop-filter: blur(15px);
-            transition: all 0.4s;
-            cursor: default;
-            z-index: 10;
-            animation: cardFloat 5s ease-in-out infinite;
-        }
-        .cloud-card:hover { transform: translateY(-5px) scale(1.05); border-color: rgba(0,212,170,0.3); }
-        .cloud-card .card-icon {
-            width: 28px; height: 28px;
-            border-radius: 6px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.1rem;
-        }
-        @keyframes cardFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-        .card-aws      { top: 5%;  left: 30%;  animation-delay: 0s; }
-        .card-azure     { top: 12%; right: 5%; animation-delay: -1s; }
-        .card-gcloud    { top: 40%; left: 10%; animation-delay: -2s; }
-        .card-anthropic { top: 55%; left: 25%; animation-delay: -3s; }
-        .card-gemini    { bottom: 15%; left: 30%; animation-delay: -2.5s; }
-        .card-alibaba   { top: 30%; right: 0%; animation-delay: -1.5s; }
-        .card-oracle    { top: 50%; right: -5%; animation-delay: -4s; }
-        .card-groq      { bottom: 20%; right: 10%; animation-delay: -3.5s; }
-
-        .card-icon.aws { color: #ff9900; }
-        .card-icon.azure { color: #0078d4; }
-        .card-icon.gcloud { color: #4285f4; }
-        .card-icon.alibaba { color: #ff6a00; }
-        .card-icon.oracle { color: #f80000; }
-        .card-icon.groq { color: #f55036; }
-        .card-icon.anthropic { color: #d4a574; }
-        .card-icon.gemini { color: #8b5cf6; }
-
-        /* ── STATS BAR ── */
+        /* Bottom Stats Bar */
+        .stats-bar-wrapper { padding: 0 4rem 2rem; position: relative; z-index: 10; }
         .stats-bar {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            border-top: 1px solid rgba(255,255,255,0.06);
-            background: rgba(10,15,35,0.6);
-            backdrop-filter: blur(10px);
-            padding: 2rem 3rem;
-            transition: background 0.5s, border-color 0.5s;
+            background: rgba(13, 17, 30, 0.6); border: 1px solid rgba(138, 43, 226, 0.2);
+            backdrop-filter: blur(20px); border-radius: 20px; padding: 2rem;
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem;
         }
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 0 1rem;
-        }
-        .stat-item:not(:last-child) { border-right: 1px solid rgba(255,255,255,0.06); }
-        .stat-icon {
-            width: 44px; height: 44px;
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.1rem;
-            transition: background 0.3s;
-        }
-        .stat-icon.cat { background: rgba(99,102,241,0.15); color: #818cf8; }
-        .stat-icon.tool { background: rgba(0,212,170,0.12); color: #00d4aa; }
-        .stat-icon.cloud { background: rgba(56,189,248,0.12); color: #38bdf8; }
-        .stat-icon.live { background: rgba(251,191,36,0.12); color: #fbbf24; }
-        .stat-number { font-size: 1.5rem; font-weight: 800; color: #fff; transition: color 0.3s; }
-        .stat-label { font-size: 0.8rem; color: #64748b; transition: color 0.3s; }
+        .stat-item { display: flex; align-items: center; gap: 1.2rem; }
+        .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .icon-purple { background: rgba(138, 43, 226, 0.1); color: #d8b4fe; border: 1px solid rgba(138, 43, 226, 0.3); }
+        .icon-blue { background: rgba(0, 210, 255, 0.1); color: #93c5fd; border: 1px solid rgba(0, 210, 255, 0.3); }
+        .icon-green { background: rgba(16, 185, 129, 0.1); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .icon-pink { background: rgba(236, 72, 153, 0.1); color: #f9a8d4; border: 1px solid rgba(236, 72, 153, 0.3); }
+        .stat-text h3 { font-size: 1.8rem; font-weight: 700; line-height: 1.1; margin-bottom: 2px; }
+        .stat-text p { color: var(--text-gray); font-size: 0.85rem; }
 
-        /* ── BG GRADIENTS ── */
-        .bg-glow {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(120px);
-            pointer-events: none;
-            z-index: 0;
-            transition: opacity 0.5s;
+        @media (max-width: 1024px) {
+            .hero { flex-direction: column; padding: 2rem; }
+            .navbar, .stats-bar-wrapper { padding: 1.5rem 2rem; }
+            .hero-graphics { min-height: 400px; margin-top: 3rem; }
+            .orbital-ring { width: 500px; height: 500px; right: -50px; }
+            .title { font-size: 3.5rem; }
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
         }
-        .glow-1 { width: 600px; height: 600px; top: -10%; left: -5%; background: rgba(124,58,237,0.12); }
-        .glow-2 { width: 500px; height: 500px; bottom: 10%; right: -5%; background: rgba(0,212,170,0.08); }
-        .glow-3 { width: 400px; height: 400px; top: 40%; left: 40%; background: rgba(99,102,241,0.06); }
-
-        /* ══════════════════════════════════════════
-           LIGHT THEME
-           ══════════════════════════════════════════ */
-        body.light-theme {
-            background: linear-gradient(180deg, #f0f4f8 0%, #e8ecf2 50%, #f0f4f8 100%);
-            color: #1e293b;
-        }
-        body.light-theme .bg-glow { opacity: 0.3; }
-        body.light-theme .nav-logo { color: #1e293b; }
-        body.light-theme .btn-login-nav { color: #475569; border-color: rgba(0,0,0,0.12); }
-        body.light-theme .btn-login-nav:hover { border-color: #00b894; color: #059669; }
-        body.light-theme .btn-signup-nav { color: #fff; }
-        body.light-theme .theme-toggle-landing {
-            background: rgba(0,0,0,0.04);
-            border-color: rgba(0,0,0,0.1);
-            color: #7c3aed;
-        }
-        body.light-theme .theme-toggle-landing:hover {
-            background: rgba(124,58,237,0.08);
-            border-color: #7c3aed;
-        }
-        body.light-theme .hero-title { color: #0f172a; }
-        body.light-theme .hero-description { color: #64748b; }
-        body.light-theme .btn-outline { color: #475569; border-color: rgba(0,0,0,0.15); }
-        body.light-theme .btn-outline:hover { border-color: #7c3aed; color: #7c3aed; }
-        body.light-theme .orb {
-            background: radial-gradient(circle, rgba(124,58,237,0.1) 0%, rgba(124,58,237,0.02) 50%, transparent 70%);
-            border-color: rgba(124,58,237,0.08);
-        }
-        body.light-theme .cloud-card {
-            background: rgba(255,255,255,0.85);
-            border-color: rgba(0,0,0,0.08);
-            color: #1e293b;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-        }
-        body.light-theme .cloud-card:hover { border-color: rgba(0,212,170,0.3); box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
-        body.light-theme .badge-text {
-            background: rgba(255,255,255,0.9);
-            border-color: rgba(0,0,0,0.08);
-            color: #b45309;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-        }
-        body.light-theme .stats-bar {
-            background: rgba(255,255,255,0.7);
-            border-top-color: rgba(0,0,0,0.06);
-            backdrop-filter: blur(10px);
-        }
-        body.light-theme .stat-item:not(:last-child) { border-right-color: rgba(0,0,0,0.06); }
-        body.light-theme .stat-number { color: #0f172a; }
-        body.light-theme .stat-label { color: #64748b; }
-        body.light-theme .stat-icon.cat { background: rgba(99,102,241,0.08); }
-        body.light-theme .stat-icon.tool { background: rgba(0,212,170,0.08); }
-        body.light-theme .stat-icon.cloud { background: rgba(56,189,248,0.08); }
-        body.light-theme .stat-icon.live { background: rgba(251,191,36,0.08); }
-
-        /* ── RESPONSIVE ── */
-        @media (max-width: 900px) {
-            .hero { grid-template-columns: 1fr; text-align: center; padding: 2rem 1.5rem; }
-            .hero-right { display: none; }
-            .hero-description { margin: 0 auto 2rem; }
-            .hero-btns { justify-content: center; }
-            .stats-bar { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
-            .stat-item:nth-child(2) { border-right: none; }
-            .navbar { padding: 1rem 1.5rem; }
-        }
-        @media (max-width: 480px) {
-            .stats-bar { grid-template-columns: 1fr; }
-            .stat-item { border-right: none !important; }
+        @media (max-width: 768px) {
+            .title { font-size: 2.5rem; }
+            .stats-bar { grid-template-columns: 1fr; gap: 1.5rem; }
+            .hero-actions { flex-direction: column; }
         }
     </style>
 </head>
 <body>
-    <div class="bg-glow glow-1"></div>
-    <div class="bg-glow glow-2"></div>
-    <div class="bg-glow glow-3"></div>
+    <div class="stars"></div>
 
     <nav class="navbar">
-        <a href="index.html" class="nav-logo">
-            <i class="fas fa-cloud"></i>
+        <a href="index.html" class="logo">
+            <div class="logo-icon"><i class="fas fa-cloud" style="font-size: 0.9rem;"></i></div>
             <span>CloudCompare AI</span>
         </a>
         <div class="nav-actions">
-            <button class="theme-toggle-landing" id="themeToggle" title="Toggle light/dark mode">
-                <i class="fas fa-sun" id="themeIcon"></i>
-            </button>
-            <a href="login.html" class="btn-nav btn-login-nav">Login</a>
-            <a href="signup.html" class="btn-nav btn-signup-nav">Signup</a>
+            <a href="login.html" class="btn btn-outline">Login</a>
+            <a href="signup.html" class="btn btn-primary">Signup</a>
         </div>
     </nav>
 
     <main class="hero">
-        <div class="hero-left">
-            <span class="hero-tag">Smart Cloud & AI Discovery Platform</span>
-            <h1 class="hero-title">
+        <div class="hero-content">
+            <div class="subtitle">Smart Cloud & AI Discovery Platform</div>
+            <h1 class="title">
                 Compare.<br>
                 Analyze.<br>
-                <span class="gradient-text">Choose Better.</span>
+                <span>Choose Better.</span>
             </h1>
-            <p class="hero-description">Discover and compare leading AI tools, cloud platforms, and modern software solutions in one intelligent platform.</p>
-            <div class="hero-btns">
-                <a href="login.html" class="btn-primary">Start Comparing <i class="fas fa-arrow-right"></i></a>
-                <a href="signup.html" class="btn-outline">Explore AI Tools</a>
+            <p class="description">
+                Discover and compare leading AI tools, cloud platforms, and modern software solutions in one intelligent platform.
+            </p>
+            <div class="hero-actions">
+                <a href="login.html" class="btn btn-primary">Start Comparing &rarr;</a>
+                <a href="#explore" class="btn btn-hero-outline">Explore AI Tools</a>
             </div>
         </div>
-        <div class="hero-right">
-            <div class="badge-text"><i class="fas fa-star"></i> 5000+ AI & Cloud Services Compared</div>
-            <div class="orb"></div>
-            <div class="cloud-card card-aws"><span class="card-icon aws"><i class="fab fa-aws"></i></span> AWS</div>
-            <div class="cloud-card card-azure"><span class="card-icon azure"><i class="fab fa-microsoft"></i></span> Azure</div>
-            <div class="cloud-card card-gcloud"><span class="card-icon gcloud"><i class="fab fa-google"></i></span> Google Cloud</div>
-            <div class="cloud-card card-anthropic"><span class="card-icon anthropic"><i class="fas fa-brain"></i></span> AI Anthropic</div>
-            <div class="cloud-card card-gemini"><span class="card-icon gemini"><i class="fas fa-gem"></i></span> Gemini</div>
-            <div class="cloud-card card-alibaba"><span class="card-icon alibaba"><i class="fas fa-cloud"></i></span> Alibaba Cloud</div>
-            <div class="cloud-card card-oracle"><span class="card-icon oracle"><i class="fas fa-database"></i></span> Oracle</div>
-            <div class="cloud-card card-groq"><span class="card-icon groq"><i class="fas fa-bolt"></i></span> groq</div>
+        
+        <div class="hero-graphics">
+            <div class="top-badge"><i class="fas fa-star"></i> 5000+ AI & Cloud Services Compared</div>
+            <div class="orbital-ring"></div>            <div class="floating-logo logo-aws"><img src="https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg" alt="AWS"></div>
+            <div class="floating-logo logo-azure"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a8/Microsoft_Azure_Logo.svg" alt="Azure"></div>
+            <div class="floating-logo logo-gcp"><img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Google_Cloud_logo.svg" alt="GCP"></div>
+            <div class="floating-logo logo-oci"><img src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Oracle_Logo.svg" alt="OCI"></div>
+            <div class="floating-logo logo-alibaba"><span style="color: #ff6a00; font-weight: 800; font-size: 1.1rem;">Alibaba<br>Cloud</span></div>
+            
+            <div class="floating-logo logo-anthropic"><span>AI</span><small>ANTHROPIC</small></div>
+            <div class="floating-logo logo-gemini">Gemini</div>
+            <div class="floating-logo logo-groq">groq</div>
         </div>
     </main>
 
-    <section class="stats-bar">
-        <div class="stat-item">
-            <div class="stat-icon cat"><i class="fas fa-th-large"></i></div>
-            <div><div class="stat-number">500+</div><div class="stat-label">AI Categories</div></div>
+    <div class="stats-bar-wrapper">
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-icon icon-purple"><i class="fas fa-th-large"></i></div>
+                <div class="stat-text">
+                    <h3>500+</h3>
+                    <p>AI Categories</p>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon icon-blue"><i class="fas fa-layer-group"></i></div>
+                <div class="stat-text">
+                    <h3>10K+</h3>
+                    <p>Tool Comparisons</p>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon icon-green"><i class="fas fa-cloud"></i></div>
+                <div class="stat-text">
+                    <h3>50+</h3>
+                    <p>Cloud Providers</p>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon icon-pink"><i class="fas fa-chart-line"></i></div>
+                <div class="stat-text">
+                    <h3>Real-Time</h3>
+                    <p>Insights</p>
+                </div>
+            </div>
         </div>
-        <div class="stat-item">
-            <div class="stat-icon tool"><i class="fas fa-layer-group"></i></div>
-            <div><div class="stat-number">10K+</div><div class="stat-label">Tool Comparisons</div></div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-icon cloud"><i class="fas fa-cloud"></i></div>
-            <div><div class="stat-number">50+</div><div class="stat-label">Cloud Providers</div></div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-icon live"><i class="fas fa-chart-line"></i></div>
-            <div><div class="stat-number">Real-Time</div><div class="stat-label">Insights</div></div>
-        </div>
-    </section>
-
-    <script>
-        // Theme toggle — syncs with dashboard via localStorage
-        (function() {
-            const toggle = document.getElementById('themeToggle');
-            const icon = document.getElementById('themeIcon');
-            const saved = localStorage.getItem('cc-theme');
-            if (saved === 'light') {
-                document.body.classList.add('light-theme');
-                icon.classList.replace('fa-sun', 'fa-moon');
-            }
-            toggle.addEventListener('click', () => {
-                const isLight = document.body.classList.toggle('light-theme');
-                icon.classList.replace(
-                    isLight ? 'fa-sun' : 'fa-moon',
-                    isLight ? 'fa-moon' : 'fa-sun'
-                );
-                localStorage.setItem('cc-theme', isLight ? 'light' : 'dark');
-            });
-        })();
-    </script>
+    </div>
 </body>
 </html>

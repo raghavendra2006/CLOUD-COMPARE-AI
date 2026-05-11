@@ -13,14 +13,7 @@
         @keyframes slideIn { from { opacity: 0; transform: translateZ(30px) translateY(20px); } to { opacity: 1; transform: translateZ(30px) translateY(0); } }
         @keyframes pulseStrength { 0% { opacity: 0.6; transform: scale(0.98); } 50% { opacity: 1; transform: scale(1.02); } 100% { opacity: 0.6; transform: scale(0.98); } }
 
-        body {
-            margin: 0;
-            background: #060b1e;
-            color: white;
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            transition: background 0.5s ease, color 0.5s ease;
-        }
+        /* body styles moved to style.css */
 
         /* Auth nav */
         .auth-nav {
@@ -131,34 +124,17 @@
         .form-validation.error { color: #fca5a5; display: flex; }
         .form-validation.success { color: #86efac; display: flex; }
 
-        /* ══ LIGHT THEME ══ */
-        body.light-theme { background: linear-gradient(180deg, #f0f4f8 0%, #e8ecf2 100%); color: #1e293b; }
-        body.light-theme .auth-nav-logo { color: #1e293b; }
-        body.light-theme .theme-toggle-auth { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.1); color: #7c3aed; }
-        body.light-theme .theme-toggle-auth:hover { background: rgba(124,58,237,0.08); border-color: #7c3aed; }
-        body.light-theme .auth-card { background: rgba(255,255,255,0.85); border-color: rgba(0,0,0,0.08); box-shadow: 0 25px 60px rgba(0,0,0,0.08); }
-        body.light-theme .auth-header h2 { color: #0f172a; }
-        body.light-theme .auth-header p { color: #64748b; }
-        body.light-theme .form-group label { color: #64748b; }
-        body.light-theme .form-control { background: rgba(241,245,249,0.9); border-color: rgba(0,0,0,0.08); color: #1e293b; }
-        body.light-theme .form-control:focus { border-color: #00d4aa; background: #fff; box-shadow: 0 0 20px rgba(0,212,170,0.1); }
-        body.light-theme .form-control::placeholder { color: #94a3b8; }
-        body.light-theme .strength-bar { background: rgba(0,0,0,0.1); }
-        body.light-theme .auth-footer { color: #94a3b8; }
-        body.light-theme .auth-footer a { color: #059669; }
-        body.light-theme .auth-footer a:hover { color: #0f172a; text-shadow: none; }
-        body.light-theme .btn-auth { color: #fff; }
+        /* removed light theme */
     </style>
 </head>
 <body>
+    <div class="stars"></div>
     <nav class="auth-nav">
         <a href="index.html" class="auth-nav-logo">
             <i class="fas fa-cloud"></i> CloudCompare AI
         </a>
         <div class="auth-nav-actions">
-            <button class="theme-toggle-auth" id="themeToggle" title="Toggle light/dark mode">
-                <i class="fas fa-sun" id="themeIcon"></i>
-            </button>
+            <!-- removed theme toggle -->
         </div>
     </nav>
 
@@ -212,21 +188,7 @@
     </div>
 
     <script>
-        // ═══ Theme Toggle ═══
-        (function() {
-            const toggle = document.getElementById('themeToggle');
-            const icon = document.getElementById('themeIcon');
-            const saved = localStorage.getItem('cc-theme');
-            if (saved === 'light') {
-                document.body.classList.add('light-theme');
-                icon.classList.replace('fa-sun', 'fa-moon');
-            }
-            toggle.addEventListener('click', () => {
-                const isLight = document.body.classList.toggle('light-theme');
-                icon.classList.replace(isLight ? 'fa-sun' : 'fa-moon', isLight ? 'fa-moon' : 'fa-sun');
-                localStorage.setItem('cc-theme', isLight ? 'light' : 'dark');
-            });
-        })();
+        // ═══ Theme Toggle Removed ═══
 
         // ═══ FORM VALIDATION ═══
         const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;

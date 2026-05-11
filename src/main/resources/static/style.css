@@ -4,28 +4,28 @@
 
 /* Dark Navy & Teal CSS Variables */
 :root {
-    --primary: #00d4aa;
+    --primary: #00d2ff;
     --primary-dark: #00b894;
-    --secondary: #7c3aed;
+    --secondary: #8a2be2;
     --success: #22c55e;
     --warning: #fbbf24;
     --danger: #ef4444;
-    --dark-bg: #060b1e;
+    --dark-bg: #030014;
     --dark-card: rgba(15, 23, 42, 0.85);
-    --dark-border: rgba(0, 212, 170, 0.12);
+    --dark-border: rgba(0, 210, 255, 0.12);
     --glass-bg: rgba(15, 23, 42, 0.6);
-    --glass-border: rgba(0, 212, 170, 0.1);
-    --text-primary: #e2e8f0;
+    --glass-border: rgba(0, 210, 255, 0.1);
+    --text-primary: #ffffff;
     --text-secondary: #94a3b8;
     --text-muted: #475569;
-    --gradient: linear-gradient(135deg, #00d4aa, #00b894, #059669);
-    --gradient-warm: linear-gradient(135deg, #00d4aa, #7c3aed);
-    --gradient-cool: linear-gradient(135deg, #7c3aed, #00d4aa);
-    --gradient-purple: linear-gradient(135deg, #7c3aed, #a78bfa);
+    --gradient: linear-gradient(135deg, #00d2ff, #8a2be2);
+    --gradient-warm: linear-gradient(135deg, #00d2ff, #8a2be2);
+    --gradient-cool: linear-gradient(135deg, #8a2be2, #00d2ff);
+    --gradient-purple: linear-gradient(135deg, #8a2be2, #a78bfa);
     --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
-    --shadow-glow: 0 0 40px rgba(0, 212, 170, 0.1);
-    --gold-shimmer: linear-gradient(135deg, #00d4aa 0%, #7c3aed 40%, #00d4aa 60%, #059669 100%);
+    --shadow-glow: 0 0 40px rgba(0, 210, 255, 0.1);
+    --gold-shimmer: linear-gradient(135deg, #00d2ff 0%, #8a2be2 40%, #00d2ff 60%, #059669 100%);
 }
 
 /* Reset & Base */
@@ -37,14 +37,33 @@
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: 
-        radial-gradient(ellipse at top left, rgba(124, 58, 237, 0.06), transparent 50%),
-        radial-gradient(ellipse at top right, rgba(0, 212, 170, 0.04), transparent 50%),
-        radial-gradient(ellipse at bottom center, rgba(99, 102, 241, 0.03), transparent 50%),
-        linear-gradient(180deg, #060b1e 0%, #0a1128 50%, #060b1e 100%);
+    background-color: var(--dark-bg);
     color: var(--text-primary);
     line-height: 1.6;
     min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Dynamic Space Background */
+body::before {
+    content: ''; 
+    position: fixed; 
+    inset: 0; 
+    z-index: -2;
+    background: 
+        radial-gradient(ellipse at 80% 50%, rgba(138, 43, 226, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 20% 80%, rgba(0, 210, 255, 0.1) 0%, transparent 40%);
+}
+
+/* Stars effect */
+.stars { 
+    position: fixed; 
+    inset: 0; 
+    z-index: -1; 
+    background-image: radial-gradient(#ffffff 1px, transparent 1px); 
+    background-size: 50px 50px; 
+    opacity: 0.1; 
 }
 
 /* App Container */
@@ -58,10 +77,10 @@ body {
 
 /* Header - Glassmorphism */
 .header {
-    background: rgba(6, 11, 30, 0.9);
+    background: transparent;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--glass-border);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
     padding: 1.5rem 2rem;
     display: flex;
     justify-content: space-between;
@@ -77,14 +96,14 @@ body {
 }
 
 .logo-icon {
-    width: 48px;
-    height: 48px;
-    background: var(--gold-shimmer);
-    border-radius: 12px;
+    width: 32px;
+    height: 32px;
+    background: var(--gradient);
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: 0.9rem;
     color: white;
 }
 
