@@ -66,7 +66,7 @@ export default function SignupForm() {
       await authApi.signup(username, email, password)
       navigate('/login')
     } catch (err) {
-      setError(err.response?.data?.message || 'Signup failed. Please try again.')
+      setError(err.response?.data?.message || err.response?.data?.error || 'Signup failed. Please try again.')
     } finally {
       setLoading(false)
     }

@@ -9,6 +9,7 @@ import com.cloudcompare.ai.dto.Region;
 import com.cloudcompare.ai.dto.ServiceType;
 import com.cloudcompare.ai.dto.ChatRequest;
 import com.cloudcompare.ai.dto.ChatResponse;
+import com.cloudcompare.ai.dto.NlpQueryRequest;
 import com.cloudcompare.ai.service.CacheService;
 import com.cloudcompare.ai.service.GrokClientService;
 import com.cloudcompare.ai.service.MetaDataService;
@@ -19,7 +20,6 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,7 +37,6 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:3000")
 public class ApiController {
 
     private static final Logger log = LoggerFactory.getLogger(ApiController.class);
@@ -159,6 +158,42 @@ public class ApiController {
             log.error("AI Tool Analysis interrupted: {}", err.getMessage());
             Thread.currentThread().interrupt();
             return ResponseEntity.status(502).body(ApiResponse.error("AI Analysis interrupted"));
+        }
+    }
+
+    @PostMapping("/nlp-compare")
+    public ResponseEntity<Object> compareAiToolsFromNaturalLanguage(@Valid @RequestBody NlpQueryRequest req) {
+        String query = req.getQuery().trim();
+        log.info("NLP AI Analysis request for: {}", query);
+
+        try {
+            String cacheKey = "nlp_tool_" + query.toLowerCase().replaceAll("\\s+", "_");
+            @SuppressWarnings("unchecked")
+            List<AiToolResult> grokResults = (List<AiToolResult>) cacheService.get(cacheKey);
+
+            if (grokResults == null) {
+                grokResults = grokClientService.fetchNlpComparisonFromGrok(query);
+                grokResults.sort((a, b) -> Double.compare(b.getScore(), a.getScore()));
+                for (int i = 0; i < grokResults.size(); i++) {
+                    grokResults.get(i).setRank(i + 1);
+                }
+                cacheService.set(cacheKey, grokResults);
+            }
+
+            return ResponseEntity.ok(ApiResponse.success(Map.of(
+                    "query", query,
+                    "intent", grokClientService.classifyQueryIntent(query),
+                    "totalResults", grokResults.size(),
+                    "tools", grokResults
+            )));
+
+        } catch (RuntimeException | IOException err) {
+            log.error("NLP AI Tool Analysis failed: {}", err.getMessage());
+            return ResponseEntity.status(502).body(ApiResponse.error("NLP AI Analysis failed: " + err.getMessage()));
+        } catch (InterruptedException err) {
+            log.error("NLP AI Tool Analysis interrupted: {}", err.getMessage());
+            Thread.currentThread().interrupt();
+            return ResponseEntity.status(502).body(ApiResponse.error("NLP AI Analysis interrupted"));
         }
     }
 

@@ -15,9 +15,9 @@ export default function AiResultsGrid({ results, query }) {
           Found <span className="text-gold-accent font-bold">{results.totalResults || results.tools.length}</span> tools
           for: <span className="text-accent-green italic">"{results.purpose || results.originalQuery || query}"</span>
         </p>
-        {results.classifiedIntent && (
+        {(results.classifiedIntent || results.intent) && (
           <p className="text-xs text-text-muted mt-1">
-            <i className="fas fa-tag mr-1" />Classified as: <span className="text-gold-dim">{results.classifiedIntent}</span>
+            <i className="fas fa-tag mr-1" />Classified as: <span className="text-gold-dim">{results.classifiedIntent || results.intent}</span>
           </p>
         )}
       </div>

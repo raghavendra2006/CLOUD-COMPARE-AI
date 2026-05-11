@@ -1,55 +1,92 @@
 variable "aws_region" {
-  description = "AWS region to deploy to"
+  description = "AWS region"
   type        = string
   default     = "us-east-1"
 }
 
-variable "app_name" {
-  description = "Application name used for resource naming"
+variable "aws_access_key_id" {
+  description = "AWS access key ID. Prefer TF_VAR_aws_access_key_id or AWS_ACCESS_KEY_ID instead of committing this."
   type        = string
-  default     = "cloudcompare-ai"
+  sensitive   = true
+  default     = null
 }
 
-variable "vpc_cidr" {
-  description = "VPC CIDR range"
+variable "aws_secret_access_key" {
+  description = "AWS secret access key. Prefer TF_VAR_aws_secret_access_key or AWS_SECRET_ACCESS_KEY instead of committing this."
   type        = string
-  default     = "10.0.0.0/16"
+  sensitive   = true
+  default     = null
 }
 
-variable "private_subnet_cidrs" {
-  description = "CIDR blocks for private subnets (2 required for ALB/ECS)"
-  type        = list(string)
-  default     = ["10.0.1.0/24", "10.0.2.0/24"]
+variable "aws_session_token" {
+  description = "Optional AWS session token for temporary credentials."
+  type        = string
+  sensitive   = true
+  default     = null
 }
 
-variable "public_subnet_cidrs" {
-  description = "CIDR blocks for public subnets (2 required)"
-  type        = list(string)
-  default     = ["10.0.101.0/24", "10.0.102.0/24"]
+variable "db_password" {
+  description = "RDS MySQL password"
+  type        = string
+  sensitive   = true
 }
-
 
 variable "db_username" {
-  description = "RDS master username"
+  description = "RDS MySQL username"
+  default     = "root"
   type        = string
-  default     = "ccadmin"
 }
 
-variable "db_allocated_storage" {
-  description = "RDS allocated storage in GB"
-  type        = number
-  default     = 20
-}
-
-variable "ecs_container_port" {
-  description = "Port the Spring Boot app listens on"
-  type        = number
-  default     = 8080
-}
-
-variable "container_image" {
-  description = "ECR image URI for the application"
+variable "db_name" {
+  description = "RDS MySQL database name"
+  default     = "cloudcompare"
   type        = string
-  default     = "REPLACE_ME"
 }
 
+variable "groq_api_key" {
+  description = "Groq API Key for AI Engine"
+  type        = string
+  sensitive   = true
+}
+
+variable "jwt_secret" {
+  description = "Secret used to sign JWT tokens."
+  type        = string
+  sensitive   = true
+}
+
+variable "backend_docker_image" {
+  description = "Docker image used for the Spring Boot backend."
+  type        = string
+  default     = "raghavendra76/cloudcompare-ai:latest"
+}
+
+variable "backend_instance_type" {
+  description = "EC2 instance type for the backend."
+  type        = string
+  default     = "t2.micro"
+}
+
+variable "rds_instance_class" {
+  description = "RDS instance class for MySQL."
+  type        = string
+  default     = "db.t3.micro"
+}
+
+variable "ec2_key_name" {
+  description = "Optional existing EC2 key pair name for SSH access."
+  type        = string
+  default     = null
+}
+
+variable "allowed_ssh_cidr_blocks" {
+  description = "CIDR blocks allowed to SSH into the backend."
+  type        = list(string)
+  default     = []
+}
+
+variable "allowed_backend_cidr_blocks" {
+  description = "CIDR blocks allowed to reach the public backend API."
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}

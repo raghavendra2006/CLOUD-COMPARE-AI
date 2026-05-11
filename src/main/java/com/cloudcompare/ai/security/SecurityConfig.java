@@ -64,7 +64,7 @@ public class SecurityConfig {
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
                         .requestMatchers(PUBLIC_STATIC_RESOURCES).permitAll()
                         // PROTECTED: AI comparison endpoints require JWT authentication
-                        .requestMatchers("/api/compare", "/api/ai-compare").authenticated()
+                        .requestMatchers("/api/compare", "/api/ai-compare", "/api/nlp-compare").authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

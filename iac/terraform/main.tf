@@ -1,102 +1,81 @@
 terraform {
-  required_version = ">= 1.5.0"
-
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 5.0"
+      version = "~> 5.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.6"
     }
   }
 }
 
 provider "aws" {
-  region = var.aws_region
-}
-
-data "aws_availability_zones" "available" {
-  state = "available"
+  region     = var.aws_region
+  access_key = var.aws_access_key_id
+  secret_key = var.aws_secret_access_key
+  token      = var.aws_session_token
 }
 
 locals {
-  name = var.app_name
-  azs  = slice(data.aws_availability_zones.available.names, 0, 2)
-}
-
-resource "aws_vpc" "this" {
-  cidr_block           = var.vpc_cidr
-  enable_dns_support   = true
-  enable_dns_hostnames = true
-
-  tags = {
-    Name = "${local.name}-vpc"
+  backend_port      = 3000
+  frontend_dist_dir = "${path.module}/../../cloudcompare-frontend/dist"
+  frontend_files    = fileset(local.frontend_dist_dir, "**/*")
+  frontend_url      = "http://${aws_s3_bucket_website_configuration.frontend.website_endpoint}/app/"
+  backend_url       = "http://${aws_instance.backend.public_ip}:${local.backend_port}"
+  common_tags = {
+    Project = "cloudcompare-ai"
+  }
+  content_types = {
+    css   = "text/css"
+    html  = "text/html"
+    js    = "application/javascript"
+    json  = "application/json"
+    map   = "application/json"
+    png   = "image/png"
+    svg   = "image/svg+xml"
+    txt   = "text/plain"
+    woff  = "font/woff"
+    woff2 = "font/woff2"
   }
 }
 
-resource "aws_internet_gateway" "igw" {
-  vpc_id = aws_vpc.this.id
+data "aws_vpc" "default" {
+  default = true
+}
 
-  tags = {
-    Name = "${local.name}-igw"
+data "aws_subnets" "default" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
   }
 }
 
-resource "aws_subnet" "public" {
-  for_each = { for i, cidr in var.public_subnet_cidrs : i => cidr }
-
-  vpc_id                  = aws_vpc.this.id
-  cidr_block              = each.value
-  availability_zone       = local.azs[tonumber(each.key)]
-  map_public_ip_on_launch = true
-
-  tags = {
-    Name = "${local.name}-public-${each.key}"
-  }
-}
-
-resource "aws_subnet" "private" {
-  for_each = { for i, cidr in var.private_subnet_cidrs : i => cidr }
-
-  vpc_id            = aws_vpc.this.id
-  cidr_block        = each.value
-  availability_zone = local.azs[tonumber(each.key)]
-
-  tags = {
-    Name = "${local.name}-private-${each.key}"
-  }
-}
-
-resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.this.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.igw.id
-  }
-
-  tags = {
-    Name = "${local.name}-public-rt"
-  }
-}
-
-resource "aws_route_table_association" "public_assoc" {
-  for_each = aws_subnet.public
-
-  subnet_id      = each.value.id
-  route_table_id = aws_route_table.public.id
-}
-
-# Security Groups
-resource "aws_security_group" "alb" {
-  name        = "${local.name}-alb-sg"
-  description = "ALB security group"
-  vpc_id      = aws_vpc.this.id
+# 1. Security Groups
+resource "aws_security_group" "backend_sg" {
+  name        = "cloudcompare-backend-sg"
+  description = "Security group for backend EC2"
+  vpc_id      = data.aws_vpc.default.id
 
   ingress {
-    description = "Allow HTTP"
-    from_port   = 80
-    to_port     = 80
+    description = "Backend API from browsers"
+    from_port   = local.backend_port
+    to_port     = local.backend_port
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.allowed_backend_cidr_blocks
+  }
+
+  dynamic "ingress" {
+    for_each = length(var.allowed_ssh_cidr_blocks) > 0 ? [1] : []
+
+    content {
+      description = "SSH access"
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = var.allowed_ssh_cidr_blocks
+    }
   }
 
   egress {
@@ -106,22 +85,22 @@ resource "aws_security_group" "alb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    Name = "${local.name}-alb-sg"
-  }
+  tags = merge(local.common_tags, {
+    Name = "cloudcompare-backend-sg"
+  })
 }
 
-resource "aws_security_group" "ecs" {
-  name        = "${local.name}-ecs-sg"
-  description = "ECS service security group"
-  vpc_id      = aws_vpc.this.id
+resource "aws_security_group" "rds_sg" {
+  name        = "cloudcompare-rds-sg"
+  description = "Security group for RDS MySQL"
+  vpc_id      = data.aws_vpc.default.id
 
   ingress {
-    description     = "Allow app traffic from ALB"
-    from_port       = var.ecs_container_port
-    to_port         = var.ecs_container_port
+    description     = "MySQL from backend EC2 only"
+    from_port       = 3306
+    to_port         = 3306
     protocol        = "tcp"
-    security_groups = [aws_security_group.alb.id]
+    security_groups = [aws_security_group.backend_sg.id]
   }
 
   egress {
@@ -131,168 +110,159 @@ resource "aws_security_group" "ecs" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    Name = "${local.name}-ecs-sg"
-  }
+  tags = merge(local.common_tags, {
+    Name = "cloudcompare-rds-sg"
+  })
 }
 
-# S3 placeholder for datasets/static assets
-resource "random_id" "suffix" {
+# 2. RDS MySQL Database
+resource "aws_db_instance" "mysql" {
+  identifier             = "cloudcompare-db"
+  allocated_storage      = 20
+  engine                 = "mysql"
+  engine_version         = "8.0"
+  instance_class         = var.rds_instance_class
+  db_name                = var.db_name
+  username               = var.db_username
+  password               = var.db_password
+  parameter_group_name   = "default.mysql8.0"
+  skip_final_snapshot    = true
+  publicly_accessible    = false
+  vpc_security_group_ids = [aws_security_group.rds_sg.id]
+
+  tags = merge(local.common_tags, {
+    Name = "cloudcompare-db"
+  })
+}
+
+# 3. EC2 Backend
+data "aws_ami" "ubuntu" {
+  most_recent = true
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+  }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+  owners = ["099720109477"] # Canonical
+}
+
+resource "aws_instance" "backend" {
+  ami                         = data.aws_ami.ubuntu.id
+  instance_type               = var.backend_instance_type
+  associate_public_ip_address = true
+  key_name                    = var.ec2_key_name
+  vpc_security_group_ids      = [aws_security_group.backend_sg.id]
+  user_data_replace_on_change = true
+
+  user_data = <<-EOF
+              #!/bin/bash
+              set -euo pipefail
+              apt-get update
+              apt-get install -y docker.io
+              systemctl enable --now docker
+
+              docker rm -f cloudcompare-ai || true
+              docker pull ${var.backend_docker_image}
+              docker run -d \
+                --name cloudcompare-ai \
+                --restart unless-stopped \
+                -p ${local.backend_port}:5000 \
+                -e SERVER_PORT=5000 \
+                -e CORS_ALLOWED_ORIGINS=${local.frontend_url} \
+                -e GROK_API_KEYS=${var.groq_api_key} \
+                -e JWT_SECRET=${var.jwt_secret} \
+                -e DB_HOST=${aws_db_instance.mysql.address} \
+                -e DB_PORT=3306 \
+                -e DB_NAME=${var.db_name} \
+                -e DB_USER=${var.db_username} \
+                -e DB_PASSWORD=${var.db_password} \
+                -e SPRING_DATASOURCE_URL=jdbc:mysql://${aws_db_instance.mysql.address}:3306/${var.db_name}?useSSL=true\&requireSSL=false\&allowPublicKeyRetrieval=true\&serverTimezone=UTC \
+                -e SPRING_DATASOURCE_USERNAME=${var.db_username} \
+                -e SPRING_DATASOURCE_PASSWORD=${var.db_password} \
+                -e SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver \
+                -e SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.MySQLDialect \
+                -e SPRING_JPA_HIBERNATE_DDL_AUTO=update \
+                ${var.backend_docker_image}
+              EOF
+
+  tags = merge(local.common_tags, {
+    Name = "cloudcompare-backend"
+  })
+}
+
+# 4. S3 Frontend
+resource "random_id" "bucket_suffix" {
   byte_length = 4
 }
 
-resource "aws_s3_bucket" "datasets" {
-  bucket = "${local.name}-datasets-${random_id.suffix.hex}"
+resource "aws_s3_bucket" "frontend" {
+  bucket = "cloudcompare-frontend-${random_id.bucket_suffix.hex}"
 
-  tags = {
-    Name = "${local.name}-datasets"
-  }
-}
-
-
-# ALB
-resource "aws_lb" "alb" {
-  name               = "${local.name}-alb"
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.alb.id]
-  subnets            = [for s in aws_subnet.public : s.value.id]
-
-  tags = {
-    Name = "${local.name}-alb"
-  }
-}
-
-resource "aws_lb_target_group" "tg" {
-  name        = "${local.name}-tg"
-  port        = var.ecs_container_port
-  protocol    = "HTTP"
-  vpc_id      = aws_vpc.this.id
-  target_type = "ip"
-
-  health_check {
-    path                = "/api/test"
-    protocol            = "HTTP"
-    matcher             = "200-399"
-    interval            = 30
-    timeout             = 5
-    healthy_threshold   = 2
-    unhealthy_threshold = 3
-  }
-
-  tags = {
-    Name = "${local.name}-tg"
-  }
-}
-
-resource "aws_lb_listener" "http" {
-  load_balancer_arn = aws_lb.alb.arn
-  port              = 80
-  protocol         = "HTTP"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.tg.arn
-  }
-}
-
-# ECS Fargate
-resource "aws_ecs_cluster" "cluster" {
-  name = "${local.name}-cluster"
-}
-
-resource "aws_iam_role" "ecs_task_execution" {
-  name = "${local.name}-ecs-task-exec"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          Service = "ecs-tasks.amazonaws.com"
-        }
-        Action = "sts:AssumeRole"
-      }
-    ]
+  tags = merge(local.common_tags, {
+    Name = "cloudcompare-frontend"
   })
 }
 
-resource "aws_iam_role_policy_attachment" "ecs_task_exec" {
-  role       = aws_iam_role.ecs_task_execution.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+resource "aws_s3_bucket_website_configuration" "frontend" {
+  bucket = aws_s3_bucket.frontend.id
+
+  index_document {
+    suffix = "index.html"
+  }
+
+  error_document {
+    key = "app/index.html"
+  }
 }
 
-resource "aws_iam_role" "ecs_task" {
-  name = "${local.name}-ecs-task-role"
+resource "aws_s3_bucket_public_access_block" "frontend" {
+  bucket = aws_s3_bucket.frontend.id
 
-  assume_role_policy = jsonencode({
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
+}
+
+resource "aws_s3_bucket_policy" "frontend" {
+  bucket = aws_s3_bucket.frontend.id
+
+  policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
-        Principal = {
-          Service = "ecs-tasks.amazonaws.com"
-        }
-        Action = "sts:AssumeRole"
-      }
+        Sid       = "PublicReadGetObject"
+        Effect    = "Allow"
+        Principal = "*"
+        Action    = "s3:GetObject"
+        Resource  = "${aws_s3_bucket.frontend.arn}/*"
+      },
     ]
   })
+
+  depends_on = [aws_s3_bucket_public_access_block.frontend]
 }
 
-resource "aws_ecs_task_definition" "task" {
-  family                   = "${local.name}-task"
-  network_mode             = "awsvpc"
-  requires_compatibilities = ["FARGATE"]
-  cpu                      = "512"
-  memory                   = "1024"
-  execution_role_arn       = aws_iam_role.ecs_task_execution.arn
-  task_role_arn            = aws_iam_role.ecs_task.arn
+resource "aws_s3_object" "frontend_assets" {
+  for_each = local.frontend_files
 
-  container_definitions = jsonencode([
-    {
-      name  = "app"
-      image = var.container_image
-      essential = true
-      portMappings = [
-        {
-          containerPort = var.ecs_container_port
-          hostPort      = var.ecs_container_port
-          protocol      = "tcp"
-        }
-      ]
-      environment = [
-        {
-          name  = "SPRING_PROFILES_ACTIVE"
-          value = "prod"
-        }
-      ]
-    }
-  ])
+  bucket       = aws_s3_bucket.frontend.id
+  key          = "app/${each.value}"
+  source       = "${local.frontend_dist_dir}/${each.value}"
+  etag         = filemd5("${local.frontend_dist_dir}/${each.value}")
+  content_type = lookup(local.content_types, lower(element(split(".", each.value), length(split(".", each.value)) - 1)), "application/octet-stream")
+
+  depends_on = [aws_s3_bucket_policy.frontend]
 }
 
-resource "aws_ecs_service" "service" {
-  name            = "${local.name}-service"
-  cluster         = aws_ecs_cluster.cluster.id
-  task_definition = aws_ecs_task_definition.task.arn
-  desired_count   = 1
-  launch_type      = "FARGATE"
+resource "aws_s3_object" "frontend_runtime_config" {
+  bucket       = aws_s3_bucket.frontend.id
+  key          = "app/runtime-config.js"
+  content_type = "application/javascript"
+  content      = "window.__CLOUDCOMPARE_CONFIG__ = { API_BASE: \"${local.backend_url}\" };\n"
 
-  network_configuration {
-    subnets         = [for s in aws_subnet.private : s.value.id]
-    security_groups = [aws_security_group.ecs.id]
-    assign_public_ip = false
-  }
-
-  load_balancer {
-    target_group_arn = aws_lb_target_group.tg.arn
-    container_name   = "app"
-    container_port   = var.ecs_container_port
-  }
-
-  depends_on = [aws_lb_listener.http]
+  depends_on = [aws_s3_bucket_policy.frontend]
 }
-
-output "alb_dns_name" {
-  value = aws_lb.alb.dns_name
-}
-
