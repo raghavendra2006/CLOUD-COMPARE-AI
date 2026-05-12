@@ -23,14 +23,18 @@ public class AiToolsChatbotService {
         String question = req.getQuestion();
         Map<String, Object> aiToolsContext = req.getAiToolsContext();
 
-        // Reuse Groq tooling via existing method as an additive connectivity path.
         try {
             var results = grokClientService.fetchAiToolsComparisonFromGrok(question);
             if (results != null && !results.isEmpty() && results.get(0) != null) {
                 var top = results.get(0);
                 return ChatResponse.builder()
-                        .reply("Architect reasoning (mock/approx): The top-ranked tool is recommended because it best fits your purpose and constraints."
-                                + "\nTop hint: " + top.getToolName() + " by " + top.getProvider() + " (rating " + top.getScore() + ")")
+                        .reply(buildAiToolsArchitectReply(
+                                question,
+                                top.getToolName(),
+                                top.getProvider(),
+                                top.getScore(),
+                                aiToolsContext
+                        ))
                         .build();
             }
         } catch (Exception ignored) {
@@ -41,5 +45,25 @@ public class AiToolsChatbotService {
                 .reply("Architect reasoning: I’m ready to explain the AI tools ranking. Run AI Tools comparison first (so context is available) and try again.")
                 .build();
     }
-}
 
+    private String buildAiToolsArchitectReply(String question,
+                                              String toolName,
+                                              String provider,
+                                              double score,
+                                              Map<String, Object> aiToolsContext) {
+        int comparedTools = 0;
+        if (aiToolsContext != null && aiToolsContext.get("tools") instanceof java.util.List<?> tools) {
+            comparedTools = tools.size();
+        }
+
+        return "AI Tools Architect guidance\n\n"
+                + "Question: " + question + "\n\n"
+                + "Recommendation anchor: " + toolName + " by " + provider + " (score " + score + ")\n"
+                + "Comparison context: " + (comparedTools > 0 ? comparedTools + " AI tool options were provided." : "Using purpose-based AI tool guidance.") + "\n\n"
+                + "Selection plan:\n"
+                + "1. Use the top-ranked tool for the primary workflow.\n"
+                + "2. Validate pricing, API availability, integrations, and output quality with a small trial task.\n"
+                + "3. Keep the next-ranked tool as a backup for cost, rate-limit, or feature gaps.\n"
+                + "4. For team projects, compare ease of onboarding, documentation quality, and collaboration support before final adoption.";
+    }
+}

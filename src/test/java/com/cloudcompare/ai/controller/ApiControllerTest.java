@@ -5,6 +5,8 @@ import com.cloudcompare.ai.service.CacheService;
 import com.cloudcompare.ai.service.GrokClientService;
 import com.cloudcompare.ai.service.MetaDataService;
 import com.cloudcompare.ai.service.RankingService;
+import com.cloudcompare.ai.service.chat.AiToolsChatbotService;
+import com.cloudcompare.ai.service.chat.CloudCompareChatbotService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import java.util.Collections;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -46,6 +49,12 @@ class ApiControllerTest {
 
     @MockBean
     private RankingService rankingService;
+
+    @MockBean
+    private CloudCompareChatbotService cloudCompareChatbotService;
+
+    @MockBean
+    private AiToolsChatbotService aiToolsChatbotService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -148,6 +157,29 @@ class ApiControllerTest {
 
     @Test
     @WithMockUser(username = "test@example.com")
+    void testCompareAiToolsUsesQueryTextWhenProvided() throws Exception {
+        com.cloudcompare.ai.dto.AiCompareRequest req = new com.cloudcompare.ai.dto.AiCompareRequest();
+        req.setPurpose("dropdown purpose");
+        req.setQueryText("free text tool request");
+
+        when(cacheService.get(anyString())).thenReturn(null);
+        com.cloudcompare.ai.dto.AiToolResult tool = new com.cloudcompare.ai.dto.AiToolResult();
+        tool.setScore(8.5);
+        when(grokClientService.fetchAiToolsComparisonFromGrok(anyString()))
+                .thenReturn(new java.util.ArrayList<>(java.util.List.of(tool)));
+
+        mockMvc.perform(post("/api/ai-compare")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.purpose").value("free text tool request"));
+
+        verify(grokClientService).fetchAiToolsComparisonFromGrok("free text tool request");
+    }
+
+    @Test
+    @WithMockUser(username = "test@example.com")
     void testCompareAiToolsException() throws Exception {
         com.cloudcompare.ai.dto.AiCompareRequest req = new com.cloudcompare.ai.dto.AiCompareRequest();
         req.setPurpose("testing");
@@ -161,5 +193,43 @@ class ApiControllerTest {
                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isBadGateway())
                 .andExpect(jsonPath("$.success").value(false));
+    }
+
+    @Test
+    @WithMockUser(username = "test@example.com")
+    void testCloudChatEndpoint() throws Exception {
+        com.cloudcompare.ai.dto.ChatRequest req = new com.cloudcompare.ai.dto.ChatRequest();
+        req.setQuestion("Explain the top cloud recommendation");
+
+        when(cloudCompareChatbotService.chat(any()))
+                .thenReturn(com.cloudcompare.ai.dto.ChatResponse.builder()
+                        .reply("Cloud architect reply")
+                        .build());
+
+        mockMvc.perform(post("/api/chat/cloud")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.reply").value("Cloud architect reply"));
+    }
+
+    @Test
+    @WithMockUser(username = "test@example.com")
+    void testAiToolsChatEndpoint() throws Exception {
+        com.cloudcompare.ai.dto.ChatRequest req = new com.cloudcompare.ai.dto.ChatRequest();
+        req.setQuestion("Explain the top AI tool");
+
+        when(aiToolsChatbotService.chat(any()))
+                .thenReturn(com.cloudcompare.ai.dto.ChatResponse.builder()
+                        .reply("AI tools architect reply")
+                        .build());
+
+        mockMvc.perform(post("/api/chat/ai-tools")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.reply").value("AI tools architect reply"));
     }
 }

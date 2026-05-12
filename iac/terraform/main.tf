@@ -24,6 +24,7 @@ locals {
   frontend_files    = fileset(local.frontend_dist_dir, "**/*")
   frontend_url      = "http://${aws_s3_bucket_website_configuration.frontend.website_endpoint}/app/"
   backend_url       = "http://${aws_instance.backend.public_ip}:${local.backend_port}"
+  api_gateway_url   = aws_apigatewayv2_stage.api.invoke_url
   common_tags = {
     Project = "cloudcompare-ai"
   }
@@ -193,7 +194,56 @@ resource "aws_instance" "backend" {
   })
 }
 
-# 4. S3 Frontend
+# 4. API Gateway
+resource "aws_apigatewayv2_api" "api" {
+  name          = "cloudcompare-api"
+  protocol_type = "HTTP"
+  description   = "Production API Gateway for CloudCompare AI backend"
+
+  cors_configuration {
+    allow_credentials = false
+    allow_headers     = ["authorization", "content-type"]
+    allow_methods     = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+    allow_origins     = [local.frontend_url]
+    max_age           = 3600
+  }
+
+  tags = merge(local.common_tags, {
+    Name = "cloudcompare-api"
+  })
+}
+
+resource "aws_apigatewayv2_integration" "backend_proxy" {
+  api_id                 = aws_apigatewayv2_api.api.id
+  integration_type       = "HTTP_PROXY"
+  integration_method     = "ANY"
+  integration_uri        = "${local.backend_url}/{proxy}"
+  payload_format_version = "1.0"
+  timeout_milliseconds   = 29000
+}
+
+resource "aws_apigatewayv2_route" "backend_proxy" {
+  api_id    = aws_apigatewayv2_api.api.id
+  route_key = "ANY /{proxy+}"
+  target    = "integrations/${aws_apigatewayv2_integration.backend_proxy.id}"
+}
+
+resource "aws_apigatewayv2_stage" "api" {
+  api_id      = aws_apigatewayv2_api.api.id
+  name        = "$default"
+  auto_deploy = true
+
+  default_route_settings {
+    throttling_burst_limit = var.api_gateway_throttle_burst_limit
+    throttling_rate_limit  = var.api_gateway_throttle_rate_limit
+  }
+
+  tags = merge(local.common_tags, {
+    Name = "cloudcompare-api-default-stage"
+  })
+}
+
+# 5. S3 Frontend
 resource "random_id" "bucket_suffix" {
   byte_length = 4
 }
@@ -262,7 +312,7 @@ resource "aws_s3_object" "frontend_runtime_config" {
   bucket       = aws_s3_bucket.frontend.id
   key          = "app/runtime-config.js"
   content_type = "application/javascript"
-  content      = "window.__CLOUDCOMPARE_CONFIG__ = { API_BASE: \"${local.backend_url}\" };\n"
+  content      = "window.__CLOUDCOMPARE_CONFIG__ = { API_BASE: \"${local.api_gateway_url}\" };\n"
 
   depends_on = [aws_s3_bucket_policy.frontend]
 }

@@ -90,3 +90,15 @@ variable "allowed_backend_cidr_blocks" {
   type        = list(string)
   default     = ["0.0.0.0/0"]
 }
+
+variable "api_gateway_throttle_burst_limit" {
+  description = "Maximum API Gateway burst requests allowed in a short interval."
+  type        = number
+  default     = 100
+}
+
+variable "api_gateway_throttle_rate_limit" {
+  description = "Steady-state API Gateway request rate limit per second."
+  type        = number
+  default     = 50
+}

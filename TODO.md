@@ -3,35 +3,35 @@
 ## Step 1: Add “different chatbots” (UI + backend endpoints)
 - [x] Add chat panel UI to `src/main/resources/static/dashboard.html` (Cloud Compare + AI Tools modes)
 - [x] Add frontend chat logic in `src/main/resources/static/script.js` (chat mode, send, render)
-- [ ] Add backend endpoints in `src/main/java/com/cloudcompare/ai/controller/ApiController.java`:
-  - [ ] `POST /api/chat/cloud`
-  - [ ] `POST /api/chat/ai-tools`
-- [ ] Add backend services (additive) that build distinct Groq prompts for the two chatbot modes.
+- [x] Add backend endpoints in `src/main/java/com/cloudcompare/ai/controller/ApiController.java`:
+  - [x] `POST /api/chat/cloud`
+  - [x] `POST /api/chat/ai-tools`
+- [x] Add backend services (additive) that build distinct Groq-backed guidance for the two chatbot modes.
 
 ## Step 2: Natural language query support (backward-compatible)
-- [ ] Update `src/main/java/com/cloudcompare/ai/dto/AiCompareRequest.java` to add optional `queryText`
-- [ ] Update `POST /api/ai-compare` to use `queryText` if present, otherwise fall back to `purpose`
-- [ ] Update frontend AI tools panel to optionally accept free-text input (keep dropdown)
+- [x] Update `src/main/java/com/cloudcompare/ai/dto/AiCompareRequest.java` to add optional `queryText`
+- [x] Update `POST /api/ai-compare` to use `queryText` if present, otherwise fall back to `purpose`
+- [x] Update frontend AI tools panel to optionally accept free-text input (keep dropdown)
 
 ## Step 3: Make existing AI Architect summary accessible via chat (extra)
-- [ ] Add an “Ask Architect” button in dashboard (extra only) that seeds the appropriate chatbot with current results.
+- [x] Add an “Ask Architect” button in dashboard (extra only) that seeds the appropriate chatbot with current results.
 
 ## Step 4: Add AWS IaC + optional adapters (no behavior change)
-- [ ] Create Terraform IaC under `iac/terraform/` for API Gateway + RDS + S3 (additive artifacts only)
-- [ ] Add AWS integration classes (additive) behind feature flags (env vars) so current MySQL/JPA and mock Groq remain default.
+- [x] Create Terraform IaC under `iac/terraform/` for API Gateway + RDS + S3 (additive artifacts only)
+- [x] Add AWS integration classes (additive) behind feature flags (env vars) so current MySQL/JPA and mock Groq remain default.
 
 ## Step 5: Add/extend tests
-- [ ] Add controller tests for:
-  - `/api/chat/cloud`
-  - `/api/chat/ai-tools`
-  - `/api/ai-compare` with `queryText`
-- [ ] Ensure existing tests still pass.
+- [x] Add controller tests for:
+  - [x] `/api/chat/cloud`
+  - [x] `/api/chat/ai-tools`
+  - [x] `/api/ai-compare` with `queryText`
+- [x] Ensure existing tests still pass.
 
 ## Step 6: Verification
-- [ ] Start server using Docker fallback guide (since local Maven may not exist): `docker compose up -d --build`
-- [ ] Smoke test via browser:
-  - Existing cloud compare dashboard
-  - Existing AI tools comparison
-  - New chatbots (end-to-end)
-  - NLP free-text input
-
+- [x] Start server for smoke testing.
+  - Docker CLI is not available in this environment, so the server was started with `./mvnw spring-boot:run -Dspring-boot.run.profiles=test -Dspring-boot.run.arguments=--server.port=5001`.
+- [x] Smoke test:
+  - [x] Existing cloud compare dashboard served successfully.
+  - [x] Existing AI tools comparison returned successful results.
+  - [x] New chatbots returned successful end-to-end responses.
+  - [x] NLP free-text input returned successful results.

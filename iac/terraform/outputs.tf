@@ -13,6 +13,11 @@ output "backend_url" {
   value       = local.backend_url
 }
 
+output "api_gateway_url" {
+  description = "HTTPS URL of the API Gateway endpoint used by the frontend"
+  value       = local.api_gateway_url
+}
+
 output "rds_endpoint" {
   description = "RDS MySQL Endpoint"
   value       = aws_db_instance.mysql.endpoint

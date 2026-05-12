@@ -1939,6 +1939,27 @@ function appendChatMessage({ role, content }) {
     container.scrollIntoView({ behavior: 'smooth', block: 'end' });
 }
 
+function askArchitectFromSummary() {
+    if (!currentServices || currentServices.length === 0) {
+        alert('Run a cloud comparison first so the architect can use the current results.');
+        return;
+    }
+
+    setChatMode('cloud');
+    toggleView('ai');
+
+    const input = document.getElementById('chatInput');
+    if (input) {
+        input.value = 'Using my current comparison results, explain the best deployment choice, the main trade-off, and the next deployment step.';
+        input.focus();
+    }
+
+    appendChatMessage({
+        role: 'assistant',
+        content: 'I loaded your latest cloud comparison context. Ask the architect question now, or press Send to use the prepared question.'
+    });
+}
+
 async function sendChatMessage() {
     const input = document.getElementById('chatInput');
     if (!input) return;

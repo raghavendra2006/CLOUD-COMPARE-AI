@@ -38,7 +38,6 @@ if [ -z "$MAVEN_PROJECTBASEDIR" ]; then
   MAVEN_PROJECTBASEDIR="$BASE_DIR"
 fi
 
-exec "$JAVA_CMD" ${MAVEN_OPTS} -jar "$WRAPPER_JAR" \
+exec "$JAVA_CMD" ${MAVEN_OPTS} -classpath "$WRAPPER_JAR" org.apache.maven.wrapper.MavenWrapperMain \
   -Dmaven.multiModuleProjectDirectory="$MAVEN_PROJECTBASEDIR" \
   "$@"
-

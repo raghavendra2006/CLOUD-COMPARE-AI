@@ -3,15 +3,16 @@
 This Terraform deploys CloudCompare AI into the default AWS VPC:
 
 - React frontend hosted as an S3 static website under `/app/`
+- Amazon API Gateway HTTP API as the managed HTTPS entrypoint for browser API calls
 - Spring Boot backend running on EC2 with Docker
 - Private Amazon RDS MySQL database for user credentials
 - Security groups so only the backend can reach MySQL
-- Runtime frontend config that points the browser to the EC2 backend
+- Runtime frontend config that points the browser to the API Gateway endpoint
 
 ## Prerequisites
 
 - Terraform installed
-- AWS credentials with permissions for EC2, RDS, S3, VPC security groups, and IAM account lookup
+- AWS credentials with permissions for API Gateway, EC2, RDS, S3, VPC security groups, and IAM account lookup
 - Built frontend assets in `cloudcompare-frontend/dist`
 
 Build the frontend after frontend source changes:
@@ -57,9 +58,10 @@ terraform apply
 Terraform prints:
 
 - `frontend_url`
+- `api_gateway_url`
 - `backend_public_ip`
 - `backend_url`
 - `rds_endpoint`
 - `frontend_bucket_name`
 
-The frontend URL is the public S3 website URL. The backend connects to RDS using private networking inside the default VPC.
+The frontend URL is the public S3 website URL. The frontend calls `api_gateway_url`, which provides an HTTPS API endpoint with CORS and throttling before proxying requests to the EC2 backend. The backend connects to RDS using private networking inside the default VPC.
