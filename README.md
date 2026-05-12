@@ -3,7 +3,7 @@
 [![Java](https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.2.5-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=111111)](https://react.dev)
-[![AWS](https://img.shields.io/badge/AWS-S3%20%7C%20EC2%20%7C%20RDS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)](https://aws.amazon.com)
+[![AWS](https://img.shields.io/badge/AWS-S3%20%7C%20API_Gateway%20%7C%20EC2%20%7C%20RDS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)](https://aws.amazon.com)
 [![Terraform](https://img.shields.io/badge/Terraform-IaC-844FBA?style=for-the-badge&logo=terraform&logoColor=white)](https://www.terraform.io)
 [![Build Status](https://img.shields.io/badge/Jenkins-Passing-success?style=for-the-badge&logo=jenkins&logoColor=white)](https://jenkins.io)
 [![Quality Gate](https://img.shields.io/badge/SonarQube-Passed-success?style=for-the-badge&logo=sonarqube&logoColor=white)](https://sonarqube.org)
@@ -13,11 +13,11 @@
 
 CloudCompare AI is a full-stack multi-cloud comparison and recommendation platform that helps users evaluate cloud infrastructure services across AWS, Azure, Google Cloud Platform (GCP), Oracle Cloud Infrastructure (OCI), and Alibaba Cloud.
 
-The platform analyzes cloud resources such as compute, storage, pricing, and regional availability to generate intelligent recommendations based on cost, performance, and optimization priorities.
+The platform analyzes cloud resources such as compute, storage, pricing estimates, performance, popularity, and regional availability to generate ranked recommendations based on cost, performance, and optimization priorities.
 
-The production deployment uses a React frontend hosted on Amazon S3, a Dockerized Spring Boot backend running on Amazon EC2, and a private Amazon RDS MySQL database for secure user credential storage.
+The production deployment uses a React frontend hosted on Amazon S3, Amazon API Gateway as the managed HTTPS API entrypoint, a Dockerized Spring Boot backend running on Amazon EC2, and a private Amazon RDS MySQL database for secure user credential storage.
 
-**Topics:** `spring-boot`, `react`, `terraform`, `aws-s3`, `aws-ec2`, `amazon-rds`, `docker`, `jenkins`, `multi-cloud`, `ai`, `groq`, `java-21`
+**Topics:** `spring-boot`, `react`, `terraform`, `aws-s3`, `api-gateway`, `aws-ec2`, `amazon-rds`, `docker`, `jenkins`, `multi-cloud`, `ai`, `groq`, `java-21`
 
 ---
 
@@ -35,7 +35,7 @@ cd CLOUD-COMPARE-AI
 # 3. Start the application
 docker-compose up -d --build
 ```
-The platform will be available at `http://localhost:5000`.
+The platform will be available at `http://localhost:3000`.
 
 ---
 
@@ -46,6 +46,7 @@ CloudCompare AI is provisioned with Terraform and deployed into the default AWS 
 | Layer | AWS Service | Purpose |
 |---|---|---|
 | Frontend | Amazon S3 Static Website Hosting | Hosts the React production build under `/app/` |
+| API Management | Amazon API Gateway HTTP API | Provides managed HTTPS entrypoint, request routing, CORS, and throttling |
 | Backend | Amazon EC2 | Runs the Spring Boot API as a Docker container |
 | Database | Amazon RDS for MySQL | Stores user credentials and authentication data |
 | Networking | Default VPC + Security Groups | Controls public backend access and private database access |
@@ -53,8 +54,9 @@ CloudCompare AI is provisioned with Terraform and deployed into the default AWS 
 
 Deployment characteristics:
 - The frontend is publicly served from S3.
-- The browser reads a Terraform-generated runtime config that points it to the active backend EC2 public IP.
-- The backend accepts API traffic on port `3000`.
+- The browser reads a Terraform-generated runtime config that points it to the API Gateway HTTPS endpoint.
+- API Gateway routes requests to the Spring Boot backend running on EC2 port `3000`.
+- API Gateway provides managed SSL termination through the default `execute-api` HTTPS endpoint, CORS handling, and request throttling.
 - RDS is not publicly accessible.
 - MySQL access is restricted to the backend security group.
 - Sensitive values are supplied through Terraform variables or environment variables.
@@ -64,21 +66,25 @@ Production outputs:
 
 | Output | Value |
 |---|---|
-| Frontend URL | `http://cloudcompare-frontend-d131de99.s3-website-us-east-1.amazonaws.com/app/` |
-| Backend URL | `http://54.92.130.156:3000` |
-| RDS Endpoint | `cloudcompare-db.cij2e4mu0e71.us-east-1.rds.amazonaws.com:3306` |
+| Frontend URL | Terraform output `frontend_url` |
+| API Gateway URL | Terraform output `api_gateway_url` |
+| Backend URL | Terraform output `backend_url` |
+| RDS Endpoint | Terraform output `rds_endpoint` |
 
 ---
 
 # Features
 
 - Multi-cloud infrastructure comparison
-- AI-assisted recommendation engine using Groq + Llama 3.1
+- AI-assisted recommendation engine using Groq + LLaMA 3.1
+- AI tools comparison and natural language query support
+- Cloud and AI tools chatbot endpoints
 - Cost and performance analysis
 - Region-wise cloud comparison
 - Interactive analytics dashboard
 - JWT-based authentication and authorization
 - RESTful API architecture
+- API Gateway managed API entrypoint with throttling
 - Dockerized deployment
 - Jenkins CI/CD integration
 - Terraform-based AWS infrastructure
@@ -114,6 +120,7 @@ flowchart TB
 
     subgraph AWS[AWS Default VPC]
         S3["Amazon S3 Static Website<br/>React Frontend"]
+        APIGW["Amazon API Gateway<br/>HTTPS + CORS + Throttling"]
         EC2["Amazon EC2<br/>Dockerized Spring Boot Backend"]
         RDS[("Amazon RDS MySQL<br/>Private Database")]
 
@@ -124,8 +131,9 @@ flowchart TB
     Groq[Groq API]
 
     User -->|HTTP /app| S3
-    S3 -->|runtime-config.js points to backend| User
-    User -->|HTTP :3000 /api| EC2
+    S3 -->|runtime-config.js points to API Gateway| User
+    User -->|HTTPS /api| APIGW
+    APIGW -->|HTTP proxy :3000| EC2
     EC2 -->|JDBC MySQL 3306| RDS
     EC2 -->|AI recommendations| Groq
     BackendSG -. attached to .- EC2
@@ -139,7 +147,7 @@ flowchart LR
     GitHub[GitHub Repository] --> Build[Build and Test]
     Build --> Docker[Docker Image]
     Build --> Terraform[Terraform IaC]
-    Terraform --> AWS[AWS S3 + EC2 + RDS]
+    Terraform --> AWS[AWS S3 + API Gateway + EC2 + RDS]
     Docker --> EC2[Backend Container on EC2]
 ```
 
@@ -154,9 +162,9 @@ flowchart LR
 | Security | Spring Security, JWT, Rate Limiting |
 | Database | Amazon RDS MySQL (Production), H2 (Local/Test) |
 | ORM | Spring Data JPA, Hibernate 6 |
-| AI Integration | Groq API, Llama 3.1 |
+| AI Integration | Groq API, LLaMA 3.1 |
 | Branding | Enterprise Local Assets (Oracle OCI, AWS, GCP, Azure) |
-| Infrastructure | Terraform, AWS S3, EC2, RDS, Security Groups |
+| Infrastructure | Terraform, AWS S3, API Gateway, EC2, RDS, Security Groups |
 | DevOps | Jenkins, Docker, SonarQube |
 | Testing | JUnit 5, Mockito, JaCoCo (87%+ Coverage) |
 
@@ -186,12 +194,11 @@ cloudcompare-ai/
 │   │
 │   └── test/
 │
-├── docker/
 ├── docs/
-├── screenshots/
-├── .env.example
+├── run-via-docker/
 ├── Dockerfile
 ├── docker-compose.yml
+├── docker-compose-local.yml
 ├── pom.xml
 └── README.md
 ```
@@ -250,7 +257,7 @@ The AI recommendation engine analyzes your input and returns curated suggestions
 
 **Example Use Case:**
 * **Input:** *"Compare AWS RDS vs GCP Cloud SQL vs Azure SQL for a 500GB OLTP workload"*
-* **Output:** The platform leverages Groq (Llama 3.1) to return the top 5 matching database services, ranked by a calculated score, alongside live pricing estimates, model capabilities, and specific architectural justifications tailored to your exact workload.
+* **Output:** The platform leverages Groq (LLaMA 3.1) to return matching database services ranked by calculated score, pricing estimates, model capabilities, and architecture-oriented recommendation reasons tailored to the workload.
 
 Features include:
 - Analyzes infrastructure requirements
@@ -282,6 +289,9 @@ Dashboard includes:
 | POST | `/api/compare` | Compare cloud services | JWT Required |
 | POST | `/api/ai-compare` | AI-powered recommendations | JWT Required |
 | POST | `/api/nlp-compare` | Natural language AI tool comparison | JWT Required |
+| POST | `/api/chat/cloud` | Cloud comparison chatbot | JWT Required |
+| POST | `/api/chat/ai-tools` | AI tools chatbot | JWT Required |
+| GET | `/api/service-types/{category}` | Fetch service types by category | JWT Required |
 | GET | `/api/regions` | Fetch provider regions | JWT Required |
 
 ---
@@ -294,12 +304,14 @@ Dashboard includes:
 POST /api/compare
 
 {
-  "provider": "AWS",
-  "vcpu": 4,
+  "category": "compute",
+  "serviceType": "Virtual Machines",
+  "cpu": 4,
   "ram": 16,
   "storage": 200,
   "region": "ap-south-1",
-  "priority": "cost"
+  "priority": "cost",
+  "hours": 730
 }
 ```
 
@@ -309,10 +321,19 @@ POST /api/compare
 
 ```json
 {
-  "recommendedProvider": "AWS",
-  "estimatedMonthlyCost": 82.45,
-  "performanceScore": 91,
-  "optimization": "Best balance between cost and performance"
+  "success": true,
+  "data": {
+    "category": "compute",
+    "totalResults": 5,
+    "recommendation": {
+      "platform": "AWS",
+      "service_name": "AWS Virtual Machines",
+      "cost_per_month": 82.45,
+      "performance_score": 91,
+      "score": 88.7,
+      "reason": "Best balance between cost and performance for the selected workload."
+    }
+  }
 }
 ```
 
@@ -334,6 +355,9 @@ DB_HOST=your_db_host
 DB_NAME=cloudcompare
 DB_USER=root
 DB_PASSWORD=your_password
+
+# Optional runtime
+SERVER_PORT=5000
 ```
 
 Terraform deployment secrets should be provided through `TF_VAR_*` environment variables or a local uncommitted `terraform.tfvars` file:
@@ -387,16 +411,17 @@ To see the interactive dashboard, charts, and AI comparison cards in action, sim
 | Invalid JWT Token | Token expired | Login again |
 | MySQL Connection Failed | Database unavailable | Verify DB service |
 | Groq API Error | Invalid API key | Check `.env` configuration |
+| API Gateway 5xx Error | Backend unavailable or integration misconfigured | Verify EC2 backend health and Terraform outputs |
 
 ---
 
 # Future Enhancements
 
-- Kubernetes deployment support
 - Real-time cloud pricing APIs
 - CloudFront and HTTPS support for the S3 frontend
 - Managed secrets through AWS Secrets Manager or SSM Parameter Store
-- AI chatbot assistant
+- Deeper AI chatbot deployment planning
+- Migration recommendation and compliance advisory modules
 - Multi-user collaboration
 - Advanced cloud cost prediction
 - Carbon footprint estimation
@@ -430,8 +455,11 @@ https://github.com/raghavendra2006
 
 ---
 
-# Live Deployment
+# Deployment Outputs
 
-Frontend URL: `http://cloudcompare-frontend-d131de99.s3-website-us-east-1.amazonaws.com/app/`
+After `terraform apply`, use these outputs:
 
-Backend URL: `http://54.92.130.156:3000`
+- `frontend_url`
+- `api_gateway_url`
+- `backend_url`
+- `rds_endpoint`
