@@ -3,6 +3,8 @@ package com.cloudcompare.ai.service.chat;
 import com.cloudcompare.ai.dto.ChatRequest;
 import com.cloudcompare.ai.dto.ChatResponse;
 import com.cloudcompare.ai.service.GrokClientService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -13,6 +15,9 @@ import java.util.Map;
 @Service
 public class AiToolsChatbotService {
 
+    private static final Logger log = LoggerFactory.getLogger(AiToolsChatbotService.class);
+    private static final String DEFAULT_QUESTION = "Explain the top AI tool recommendation";
+
     private final GrokClientService grokClientService;
 
     public AiToolsChatbotService(GrokClientService grokClientService) {
@@ -20,30 +25,45 @@ public class AiToolsChatbotService {
     }
 
     public ChatResponse chat(ChatRequest req) {
-        String question = req.getQuestion();
-        Map<String, Object> aiToolsContext = req.getAiToolsContext();
+        String question = normalizeQuestion(req);
+        Map<String, Object> aiToolsContext = req != null ? req.getAiToolsContext() : null;
 
         try {
             var results = grokClientService.fetchAiToolsComparisonFromGrok(question);
             if (results != null && !results.isEmpty() && results.get(0) != null) {
                 var top = results.get(0);
+                String toolName = firstNonBlank(top.getToolName(), "the top-ranked AI tool");
+                String provider = firstNonBlank(top.getProvider(), "the listed provider");
                 return ChatResponse.builder()
                         .reply(buildAiToolsArchitectReply(
                                 question,
-                                top.getToolName(),
-                                top.getProvider(),
+                                toolName,
+                                provider,
                                 top.getScore(),
                                 aiToolsContext
                         ))
                         .build();
             }
-        } catch (Exception ignored) {
-            // fall through
+        } catch (Exception err) {
+            log.warn("AI tools chatbot live reasoning failed; returning deterministic fallback: {}", err.getMessage());
         }
 
         return ChatResponse.builder()
-                .reply("Architect reasoning: I’m ready to explain the AI tools ranking. Run AI Tools comparison first (so context is available) and try again.")
+                .reply("AI Tools Architect guidance\n\n"
+                        + "Question: " + question + "\n\n"
+                        + "I could not reach the live AI tools ranking engine, so here is a safe fallback plan: use your latest comparison results, trial the top-ranked tool on a small real task, validate pricing and integrations, and keep the next-ranked tool as a backup for quality, cost, or rate-limit gaps.")
                 .build();
+    }
+
+    private String normalizeQuestion(ChatRequest req) {
+        if (req == null || req.getQuestion() == null || req.getQuestion().isBlank()) {
+            return DEFAULT_QUESTION;
+        }
+        return req.getQuestion().trim();
+    }
+
+    private String firstNonBlank(String value, String fallback) {
+        return value != null && !value.isBlank() ? value : fallback;
     }
 
     private String buildAiToolsArchitectReply(String question,

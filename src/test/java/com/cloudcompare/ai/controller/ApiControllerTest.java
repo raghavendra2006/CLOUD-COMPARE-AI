@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -231,5 +232,57 @@ class ApiControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.reply").value("AI tools architect reply"));
+    }
+
+    @Test
+    @WithMockUser(username = "test@example.com")
+    void testCloudChatEndpointUsesFallbackWhenServiceThrows() throws Exception {
+        com.cloudcompare.ai.dto.ChatRequest req = new com.cloudcompare.ai.dto.ChatRequest();
+        req.setQuestion("Explain the top cloud recommendation");
+
+        when(cloudCompareChatbotService.chat(any()))
+                .thenThrow(new RuntimeException("production chatbot failure"));
+
+        mockMvc.perform(post("/api/chat/cloud")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.reply", containsString("Cloud Architect guidance")));
+    }
+
+    @Test
+    @WithMockUser(username = "test@example.com")
+    void testAiToolsChatEndpointUsesFallbackWhenServiceReturnsNull() throws Exception {
+        com.cloudcompare.ai.dto.ChatRequest req = new com.cloudcompare.ai.dto.ChatRequest();
+        req.setQuestion("Explain the top AI tool");
+
+        when(aiToolsChatbotService.chat(any())).thenReturn(null);
+
+        mockMvc.perform(post("/api/chat/ai-tools")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.reply", containsString("AI Tools Architect guidance")));
+    }
+
+    @Test
+    @WithMockUser(username = "test@example.com")
+    void testAiToolsChatEndpointUsesFallbackWhenReplyIsBlank() throws Exception {
+        com.cloudcompare.ai.dto.ChatRequest req = new com.cloudcompare.ai.dto.ChatRequest();
+        req.setQuestion("Explain the top AI tool");
+
+        when(aiToolsChatbotService.chat(any()))
+                .thenReturn(com.cloudcompare.ai.dto.ChatResponse.builder()
+                        .reply(" ")
+                        .build());
+
+        mockMvc.perform(post("/api/chat/ai-tools")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.reply", containsString("AI Tools Architect guidance")));
     }
 }

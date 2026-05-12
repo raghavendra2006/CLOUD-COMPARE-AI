@@ -36,6 +36,12 @@ export const aiApi = {
   nlpCompare: (query) => api.post('/nlp-compare', { query })
 }
 
+// ─── Chatbot Assistants ───────────────────────────
+export const chatApi = {
+  cloud: (question, cloudContext = {}) => api.post('/chat/cloud', { question, cloudContext }),
+  aiTools: (question, aiToolsContext = {}) => api.post('/chat/ai-tools', { question, aiToolsContext })
+}
+
 // ─── Health ────────────────────────────────────────
 export const healthApi = {
   check: () => api.get('/test')

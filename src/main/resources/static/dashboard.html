@@ -13,11 +13,11 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
-        // AUTH PROTECTION: Redirect to landing page if not logged in
+        // AUTH PROTECTION: Redirect to login page if not logged in
         (function() {
             const token = localStorage.getItem('token');
             if (!token && !window.location.search.includes('login=success')) {
-                window.location.href = 'index.html';
+                window.location.href = 'login.html';
             }
         })();
     </script>
@@ -411,45 +411,46 @@
                     </p>
                 </div>
 
-                <!-- CHATBOTS (EXTRA UI) -->
-                <section class="input-section" style="margin-top: 2rem;">
-                    <div class="section-header">
-                        <h2><i class="fas fa-comments"></i> Chatbots (Cloud vs AI Tools)</h2>
-                        <p>Ask for deeper reasoning. Both chat modes use your current selections/results.</p>
-                    </div>
+            </div> <!-- End AI View -->
 
-                    <div class="input-row" style="grid-template-columns: 1fr; gap: 1rem;">
-                        <div class="input-group">
-                            <label><i class="fas fa-chess-knight"></i> Choose Chat Mode</label>
-                            <div class="category-buttons" style="justify-content: flex-start;">
-                                <button class="category-btn" type="button" id="btnChatCloud" onclick="setChatMode('cloud')">
-                                    <i class="fas fa-cloud"></i>
-                                    <span>Cloud Compare Chatbot</span>
-                                </button>
-                                <button class="category-btn" type="button" id="btnChatAiTools" onclick="setChatMode('ai-tools')">
-                                    <i class="fas fa-brain"></i>
-                                    <span>AI Tools Comparison Chatbot</span>
-                                </button>
-                            </div>
-                        </div>
+            <!-- CHATBOTS (EXTRA UI) -->
+            <section class="input-section" style="margin-top: 2rem;">
+                <div class="section-header">
+                    <h2><i class="fas fa-comments"></i> Chatbots (Cloud vs AI Tools)</h2>
+                    <p>Ask for deeper reasoning. Both chat modes use your current selections/results.</p>
+                </div>
 
-                        <div class="input-group">
-                            <label><i class="fas fa-pen"></i> Your Question</label>
-                            <input id="chatInput" type="text" placeholder="e.g., Why is the top recommendation best for cost?" />
-                        </div>
-
-                        <div class="input-group action-group">
-                            <button class="compare-btn" type="button" onclick="sendChatMessage()">
-                                <i class="fas fa-paper-plane"></i> Send
+                <div class="input-row" style="grid-template-columns: 1fr; gap: 1rem;">
+                    <div class="input-group">
+                        <label><i class="fas fa-chess-knight"></i> Choose Chat Mode</label>
+                        <div class="category-buttons" style="justify-content: flex-start;">
+                            <button class="category-btn" type="button" id="btnChatCloud" onclick="setChatMode('cloud')">
+                                <i class="fas fa-cloud"></i>
+                                <span>Cloud Compare Chatbot</span>
+                            </button>
+                            <button class="category-btn" type="button" id="btnChatAiTools" onclick="setChatMode('ai-tools')">
+                                <i class="fas fa-brain"></i>
+                                <span>AI Tools Comparison Chatbot</span>
                             </button>
                         </div>
                     </div>
 
-                    <div id="chatOutput" style="margin-top: 1.5rem;">
-                        <div class="recommendations-grid" style="grid-template-columns: 1fr; gap: 0.75rem;" id="chatMessages"></div>
+                    <div class="input-group">
+                        <label><i class="fas fa-pen"></i> Your Question</label>
+                        <input id="chatInput" type="text" placeholder="e.g., Why is the top recommendation best for cost?" />
                     </div>
-                </section>
-            </div> <!-- End AI View -->
+
+                    <div class="input-group action-group">
+                        <button class="compare-btn" type="button" onclick="sendChatMessage()">
+                            <i class="fas fa-paper-plane"></i> Send
+                        </button>
+                    </div>
+                </div>
+
+                <div id="chatOutput" style="margin-top: 1.5rem;">
+                    <div class="recommendations-grid" style="grid-template-columns: 1fr; gap: 0.75rem;" id="chatMessages"></div>
+                </div>
+            </section>
         </main>
 
         <!-- Footer -->

@@ -63,8 +63,14 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
                         .requestMatchers(PUBLIC_STATIC_RESOURCES).permitAll()
-                        // PROTECTED: AI comparison endpoints require JWT authentication
-                        .requestMatchers("/api/compare", "/api/ai-compare", "/api/nlp-compare").authenticated()
+                        // PROTECTED: comparison and chatbot endpoints require JWT authentication
+                        .requestMatchers(
+                                "/api/compare",
+                                "/api/ai-compare",
+                                "/api/nlp-compare",
+                                "/api/chat/cloud",
+                                "/api/chat/ai-tools"
+                        ).authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

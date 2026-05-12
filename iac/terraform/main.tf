@@ -134,6 +134,10 @@ resource "aws_db_instance" "mysql" {
   tags = merge(local.common_tags, {
     Name = "cloudcompare-db"
   })
+
+  lifecycle {
+    ignore_changes = [engine_version, password]
+  }
 }
 
 # 3. EC2 Backend
@@ -156,7 +160,7 @@ resource "aws_instance" "backend" {
   associate_public_ip_address = true
   key_name                    = var.ec2_key_name
   vpc_security_group_ids      = [aws_security_group.backend_sg.id]
-  user_data_replace_on_change = true
+  user_data_replace_on_change = false
 
   user_data = <<-EOF
               #!/bin/bash
@@ -192,6 +196,10 @@ resource "aws_instance" "backend" {
   tags = merge(local.common_tags, {
     Name = "cloudcompare-backend"
   })
+
+  lifecycle {
+    ignore_changes = [user_data]
+  }
 }
 
 # 4. API Gateway

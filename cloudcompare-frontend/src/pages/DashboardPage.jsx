@@ -7,6 +7,7 @@ import ProviderCard from '../components/Cloud/ProviderCard.jsx'
 import ComparisonCharts from '../components/Cloud/ComparisonCharts.jsx'
 import NlpQueryInput from '../components/AI/NlpQueryInput.jsx'
 import AiResultsGrid from '../components/AI/AiResultsGrid.jsx'
+import ChatbotPanel from '../components/Chatbot/ChatbotPanel.jsx'
 import { useCompare } from '../hooks/useCompare.js'
 import { aiApi } from '../api/client.js'
 
@@ -92,6 +93,21 @@ export default function DashboardPage() {
             </button>
           </div>
         </div>
+
+        <ChatbotPanel
+          activeView={activeView}
+          cloudContext={{
+            category,
+            serviceType,
+            priority,
+            resources,
+            services: cloudResults?.services || cloudResults || []
+          }}
+          aiToolsContext={{
+            query: lastQuery,
+            tools: aiResults?.tools || []
+          }}
+        />
 
         {/* ═══════════ CLOUD VIEW ═══════════ */}
         {activeView === 'cloud' && (

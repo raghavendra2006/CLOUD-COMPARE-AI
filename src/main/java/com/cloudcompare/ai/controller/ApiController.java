@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * REST Controller — direct port of server.js + routes.js
@@ -199,13 +200,36 @@ public class ApiController {
 
     @PostMapping("/chat/cloud")
     public ResponseEntity<Object> chatCloud(@Valid @RequestBody ChatRequest req) {
-        ChatResponse reply = cloudCompareChatbotService.chat(req);
-        return ResponseEntity.ok(ApiResponse.success(Map.of("reply", reply.getReply())));
+        return buildChatResponse("cloud", () -> cloudCompareChatbotService.chat(req));
     }
 
     @PostMapping("/chat/ai-tools")
     public ResponseEntity<Object> chatAiTools(@Valid @RequestBody ChatRequest req) {
-        ChatResponse reply = aiToolsChatbotService.chat(req);
-        return ResponseEntity.ok(ApiResponse.success(Map.of("reply", reply.getReply())));
+        return buildChatResponse("ai-tools", () -> aiToolsChatbotService.chat(req));
+    }
+
+    private ResponseEntity<Object> buildChatResponse(String mode, Supplier<ChatResponse> chatSupplier) {
+        String fallbackReply = fallbackChatReply(mode);
+        try {
+            ChatResponse reply = chatSupplier.get();
+            String replyText = reply != null ? reply.getReply() : null;
+            if (replyText == null || replyText.isBlank()) {
+                log.warn("Chatbot mode {} returned an empty reply; using fallback response", mode);
+                replyText = fallbackReply;
+            }
+            return ResponseEntity.ok(ApiResponse.success(Map.of("reply", replyText)));
+        } catch (Exception err) {
+            log.error("Chatbot mode {} failed: {}", mode, err.getMessage(), err);
+            return ResponseEntity.ok(ApiResponse.success(Map.of("reply", fallbackReply)));
+        }
+    }
+
+    private String fallbackChatReply(String mode) {
+        if ("ai-tools".equals(mode)) {
+            return "AI Tools Architect guidance\n\n"
+                    + "I could not reach the live AI tools reasoning engine right now, but you can still compare options safely: start with the top-ranked tool from your results, validate pricing and integrations with a small trial, then keep the next-ranked tool as a backup for cost, quality, or rate-limit gaps.";
+        }
+        return "Cloud Architect guidance\n\n"
+                + "I could not reach the live cloud reasoning engine right now, but you can still move forward safely: use the top-ranked provider from your comparison as the first proof of concept, validate region availability and estimated monthly cost, then keep the second-ranked provider as a fallback for latency, compliance, or budget changes.";
     }
 }
