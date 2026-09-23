@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: cloudcompare-ai
+    env: docker
+    dockerfilePath: Dockerfile
+    plan: free
+    region: oregon
+    envVars:
+      - key: GROK_API_KEYS
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: SPRING_JPA_HIBERNATE_DDL_AUTO
+        value: update
