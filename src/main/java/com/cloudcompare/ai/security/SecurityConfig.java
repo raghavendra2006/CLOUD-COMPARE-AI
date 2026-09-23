@@ -44,15 +44,23 @@ public class SecurityConfig {
     // Static assets served from /static — always public
     private static final String[] PUBLIC_STATIC_RESOURCES = {
             "/",
-            "/index.html",
-            "/login.html",
-            "/signup.html",
-            "/dashboard.html",
-            "/style.css",
-            "/script.js",
+            "/*.html",
+            "/*.css",
+            "/*.js",
             "/*.png",
+            "/*.jpg",
+            "/*.jpeg",
+            "/*.svg",
             "/*.ico",
-            "/assets/**"
+            "/favicon.ico",
+            "/assets/**",
+            "/static/**",
+            "/react/**",
+            "/app",
+            "/app/**",
+            "/login",
+            "/signup",
+            "/dashboard"
     };
 
     @SuppressWarnings({"java:S4502", "java:S5122"}) // CSRF not required for stateless JWT REST APIs, FrameOptions disabled for H2 console
@@ -71,7 +79,7 @@ public class SecurityConfig {
                                 "/api/chat/cloud",
                                 "/api/chat/ai-tools"
                         ).authenticated()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())

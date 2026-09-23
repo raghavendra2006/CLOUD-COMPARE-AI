@@ -16,6 +16,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // Serve React build assets (JS, CSS, images)
         registry.addResourceHandler("/app/**")
+                .addResourceLocations("classpath:/static/react/", "classpath:/static/");
+        registry.addResourceHandler("/react/**")
                 .addResourceLocations("classpath:/static/react/");
     }
 
@@ -27,5 +29,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addViewController("/app/login").setViewName("forward:/react/index.html");
         registry.addViewController("/app/signup").setViewName("forward:/react/index.html");
         registry.addViewController("/app/dashboard").setViewName("forward:/react/index.html");
+
+        // Forward friendly non-.html routes
+        registry.addViewController("/login").setViewName("forward:/login.html");
+        registry.addViewController("/signup").setViewName("forward:/signup.html");
+        registry.addViewController("/dashboard").setViewName("forward:/dashboard.html");
     }
 }
